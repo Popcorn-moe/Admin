@@ -107,7 +107,7 @@ export default {
   .router-link {
     text-decoration: none;
     &.router-link-exact-active * {
-       color: $main-color;
+       color: $main-color !important;
      }
   }
 
