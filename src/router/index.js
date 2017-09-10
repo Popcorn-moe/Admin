@@ -38,27 +38,9 @@ export const routes = [
 ];
 
 const router = new Router({
-  routes: convert(routes),
+  routes,
   mode: 'history'
 });
 
-function convert(routes)
-{
-  let newRoutes = [];
-  routes.forEach((v) =>
-  {
-    if(v.hasOwnProperty("submenus"))
-    {
-      v.submenus.forEach((s) => {
-        s.path = v.path + s.path;
-        newRoutes.push(s);
-      })
-    }
-    else
-      newRoutes.push(v);
-  });
-
-  return newRoutes;
-}
 
 export default router;
