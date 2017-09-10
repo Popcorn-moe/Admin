@@ -1,0 +1,18 @@
+$main-color = #f6416c
+
+color-class(name, $color) {
+  .{name} {
+    background-color: $color !important;
+    border-color: $color !important;
+    color: #fff !important;
+  }
+
+  .{name}--text {
+    color: $color !important;
+  }
+}
+
+color-class('main-color', $main-color)
+
+
+
