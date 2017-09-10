@@ -32,7 +32,7 @@
               </v-list-tile>
               <router-link
                 v-for="submenu in route.submenus"
-                key="submenu.name"
+                :key="submenu.name"
                 :to="submenu.path"
                 class="router-link"
               >
