@@ -32,8 +32,8 @@
               </v-list-tile>
               <router-link
                 v-for="submenu in route.submenus"
-                :key="submenu.name"
-                :to="route.path + '/' + submenu.path"
+                key="submenu.name"
+                :to="submenu.path"
                 class="router-link"
               >
                 <v-list-tile>
