@@ -50,5 +50,8 @@ export default {
         }),
         uglify()
     ],
+    watch: {
+      chokidar: true
+    },
     context: 'window'
 }

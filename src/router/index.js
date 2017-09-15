@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Index from '../components/Index'
 import Tags from '../components/tags/Tags'
+import AnimeAdd from '../components/animes/add'
 
 Vue.use(Router)
 
@@ -25,7 +26,8 @@ export const routes = [
       {
         icon: 'add',
         path: '/add',
-        name: 'Add'
+        name: 'Add',
+        component: AnimeAdd
       }
     ]
   },
