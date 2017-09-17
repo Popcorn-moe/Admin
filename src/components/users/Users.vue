@@ -13,15 +13,7 @@
           <td>
             <img class="user-avatar" :src="props.item.avatar">
           </td>
-         <td>
-            <v-edit-dialog lazy> {{ props.item.login }}
-              <v-text-field
-                slot="input"
-                v-model="props.item.login"
-                single-line
-              ></v-text-field>
-            </v-edit-dialog>
-          </td>
+         <td>{{ props.item.login }}</td>
           <td>
             <v-edit-dialog lazy> {{ props.item.email }}
               <v-text-field

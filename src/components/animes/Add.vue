@@ -6,7 +6,8 @@
     <v-layout>
       <v-flex xs6 offset-xs3>
         <v-text-field
-          label="Name"
+          label="Names"
+          v-model="names"
           required
         ></v-text-field>
       </v-flex>
@@ -115,7 +116,7 @@
               </v-card-actions>
             </template>
           </v-date-picker>
-        </v-menu>
+        </v-menu>Date
       </v-flex>
     </v-layout>
     <v-layout>
@@ -126,7 +127,7 @@
         ></v-text-field>
       </v-flex>
       <v-flex xs1>
-        <v-btn icon large primary>
+        <v-btn icon large primary dark @click.stop="">
           <v-icon>file_upload</v-icon>
         </v-btn>
       </v-flex>
@@ -137,7 +138,7 @@
         ></v-text-field>
       </v-flex>
       <v-flex xs1>
-        <v-btn icon large primary>
+        <v-btn icon large primary dark @click.stop="">
           <v-icon>file_upload</v-icon>
         </v-btn>
       </v-flex>
@@ -146,17 +147,18 @@
       <v-flex>
         <v-text-field
           label="Desc"
+          v-model="desc"
           multi-line
         ></v-text-field>
       </v-flex>
     </v-layout>
-    <v-layou>
+    <v-layout>
       <v-flex offset-xs10 xs2 class="text-xs-right">
-        <v-btn primary @click.stop="">
+        <v-btn primary @click.stop="addAnime()">
           Add
         </v-btn>
       </v-flex>
-    </v-layou>
+    </v-layout>
   </v-container>
 </template>
 
@@ -166,12 +168,12 @@
   import { VContainer, VFlex, VLayout } from 'vuetify/src/components/VGrid'
   import gql from 'graphql-tag'
 
-  export default
-  {
-    name: 'animes_add',
+  export default {
     data () {
       return {
+        names: '',
         date: null,
+        desc: '',
         menu: false,
         authors: [],
         tags: [],
@@ -181,7 +183,28 @@
         selectedStatus: ''
       }
     },
-    methods: {},
+    methods: {
+      addAnime() {
+        this.$apollo.mutate({
+          mutation:
+            gql`mutation ($anime: AnimeInput!) {
+                  addAnime(anime: $anime)
+                }`,
+          variables: {
+            anime: {
+              names: this.names.split(',').map(e => e.trim()),
+              authors: this.selectedAuthors,
+              tags: this.selectedTags,
+              status: this.selectedStatus.toUpperCase(),
+              medias: [],
+              season: [],
+              desc: this.desc,
+              release_date: this.date
+            }
+          }
+        })
+      }
+    },
     components: {
       VContainer,
       VFlex,
@@ -218,11 +241,11 @@
             .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' '))
       },
       tags: {
-        query: gql`{ tags { id name color desc } }`,
+        query: gql`{ tags { id name color } }`,
         update: ({ tags }) => tags
       },
       authors: {
-        query: gql`{ authors { id name color desc } }`,
+        query: gql`{ authors { id name } }`,
         update: ({ authors }) => authors
       }
     }
