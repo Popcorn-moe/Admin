@@ -10,8 +10,24 @@
       class="elevation-1"
     >
       <template slot="items" scope="props">
-         <td><input type="text" v-model="props.item.name"></td>
-          <td><input class="full-width" type="text" v-model="props.item.desc"></td>
+         <td>
+            <v-edit-dialog lazy> {{ props.item.name }}
+              <v-text-field
+                slot="input"
+                v-model="props.item.name"
+                single-line
+              ></v-text-field>
+            </v-edit-dialog>
+          </td>
+          <td>
+            <v-edit-dialog lazy> {{ props.item.desc }}
+              <v-text-field
+                slot="input"
+                v-model="props.item.desc"
+                multi-line
+              ></v-text-field>
+            </v-edit-dialog>
+          </td>
           <td>
             <v-dialog lazy>
               <div
@@ -45,7 +61,8 @@
 </template>
 
 <script>
-import { VDataTable, VIcon, VBtn, VDialog } from 'vuetify/src/components'
+import { VDataTable, VIcon, VBtn, VDialog, VTextField } from 'vuetify/src/components'
+import VEditDialog from 'vuetify/src/components/VDataTable/VEditDialog'
 import { VContainer, VFlex, VLayout } from 'vuetify/src/components/VGrid'
 import ColorPicker from 'vue-color/src/components/Chrome.vue'
 import gql from 'graphql-tag'
@@ -88,6 +105,8 @@ export default {
     VIcon,
     VBtn,
     VDialog,
+    VEditDialog,
+    VTextField,
     ColorPicker
   },
   methods: {

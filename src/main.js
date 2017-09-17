@@ -1,5 +1,6 @@
 import Vue from 'vue'
-import { Vuetify, VTextField, VIcon, VChip } from 'vuetify/src/components'
+import { Vuetify, VTextField, VIcon, VChip, VBtn, VMenu } from 'vuetify/src/components'
+import VEditDialog from 'vuetify/src/components/VDataTable/VEditDialog'
 import App from './App'
 import router from './router'
 import store from './store'
@@ -11,6 +12,11 @@ VTextField.components = {
 
 VChip.components = {
   VIcon
+}
+
+VEditDialog.components = {
+  VMenu,
+  VBtn
 }
 
 Vue.config.productionTip = false

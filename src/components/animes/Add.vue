@@ -126,7 +126,7 @@
         ></v-text-field>
       </v-flex>
       <v-flex xs1>
-        <v-btn icon large primary @click.stop="">
+        <v-btn icon large primary>
           <v-icon>file_upload</v-icon>
         </v-btn>
       </v-flex>
@@ -137,7 +137,7 @@
         ></v-text-field>
       </v-flex>
       <v-flex xs1>
-        <v-btn icon large primary @click.stop="">
+        <v-btn icon large primary>
           <v-icon>file_upload</v-icon>
         </v-btn>
       </v-flex>

@@ -2,7 +2,8 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Index from '../components/Index'
 import Tags from '../components/tags/Tags'
-import AnimeAdd from '../components/animes/add'
+import Users from '../components/users/Users'
+import AnimeAdd from '../components/animes/Add'
 
 Vue.use(Router)
 
@@ -12,6 +13,12 @@ export const routes = [
     path: '/',
     name: 'Index',
     component: Index
+  },
+  {
+    icon: 'home',
+    path: '/users',
+    name: 'Users',
+    component: Users
   },
   {
     icon: 'video_library',
