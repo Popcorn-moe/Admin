@@ -231,7 +231,7 @@
       animesStatus: {
         query: gql`{
           __type(name: "AnimeStatus") {
-                enumValues {
+            enumValues {
               name
             }
           }
