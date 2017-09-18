@@ -40,12 +40,7 @@
       </template>
     </v-data-table>
      <v-layout row wrap>
-        <v-flex xs2 class="text-xs-left">
-          <v-btn primary>
-            Add Tag
-          </v-btn>
-        </v-flex>
-        <v-flex offset-xs8 xs2 class="text-xs-right">
+        <v-flex offset-xs10 xs2 class="text-xs-right">
           <v-btn primary>
             Save
           </v-btn>
