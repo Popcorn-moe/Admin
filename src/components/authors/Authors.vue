@@ -94,7 +94,7 @@ export default {
           text: 'Organisation',
           align: 'left',
           value: 'organisation'
-        },
+        }
       ],
       authors: [],
       deleted: []

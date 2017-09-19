@@ -4,8 +4,7 @@ import Index from '../components/Index'
 import Tags from '../components/tags/Tags'
 import Users from '../components/users/Users'
 import Authors from '../components/authors/Authors'
-import AnimeAdd from '../components/animes/Add'
-
+import { AddAnime, ListAnime } from '../components/animes';
 Vue.use(Router)
 
 export const routes = [
@@ -29,13 +28,14 @@ export const routes = [
       {
         icon: 'list',
         path: '/',
-        name: 'List'
+        name: 'List',
+        component: ListAnime
       },
       {
         icon: 'add',
         path: '/add',
         name: 'Add',
-        component: AnimeAdd
+        component: AddAnime
       }
     ]
   },
