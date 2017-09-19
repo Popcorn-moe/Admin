@@ -61,16 +61,24 @@
             </v-list-tile>
           </router-link>
         </div>
-
       </v-list>
+      <div class="bottom">
+        <v-divider></v-divider>
+        <v-layout row>
+          <v-flex xs4 offset-xs4>
+            <v-switch label="Dark" :inputValue="darkTheme" @change="setDarkTheme"></v-switch>
+          </v-flex>
+        </v-layout>
+      </div>
     </div>
     </v-navigation-drawer>
 </template>
 
 <script>
-import { VNavigationDrawer, VIcon, VBtn } from 'vuetify/src/components'
+import { VNavigationDrawer, VIcon, VBtn, VDivider, VSwitch } from 'vuetify/src/components'
 import { VContainer, VFlex, VLayout } from 'vuetify/src/components/VGrid'
 import { VList, VListGroup, VListTile, VListTileTitle, VListTileAction, VListTileContent } from 'vuetify/src/components/VList'
+import { mapGetters, mapActions } from 'vuex'
 import { routes } from '../../router'
 
 export default {
@@ -83,7 +91,6 @@ export default {
         routes
     }
   },
-
   components: {
     VNavigationDrawer,
     VIcon,
@@ -96,13 +103,33 @@ export default {
     VContainer,
     VFlex,
     VLayout,
-    VBtn
-  }
+    VBtn,
+    VDivider,
+    VSwitch
+  },
+  computed: mapGetters({
+    darkTheme: 'darkTheme',
+  }),
+  methods: mapActions({
+    setDarkTheme: 'setDarkTheme'
+  })
 }
 </script>
 
 <style lang="stylus">
   @import '../../stylus/main.styl';
+
+  .bottom {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    .input-group__details {
+      min-height: 0px;
+    }
+    .input-group {
+      padding: 9px 0;
+    }
+  }
 
   .router-link {
     text-decoration: none;

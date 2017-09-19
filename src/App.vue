@@ -1,5 +1,5 @@
 <template>
-  <v-app>
+  <v-app :light="!darkTheme" :dark="darkTheme">
     <div v-if="me">
       <layout v-if="me.group === 'ADMIN'"></layout>
       <div v-else class="unauthorized">
@@ -11,6 +11,7 @@
 
 <script>
   import { VApp } from 'vuetify/src/components'
+  import { mapGetters } from 'vuex'
   import Layout from './components/layout/Layout'
   import gql from 'graphql-tag'
 
@@ -23,6 +24,11 @@
     components: {
       Layout,
       VApp
+    },
+    computed: {
+      ...mapGetters({
+        darkTheme: 'darkTheme',
+      })
     },
     apollo: {
       me: {

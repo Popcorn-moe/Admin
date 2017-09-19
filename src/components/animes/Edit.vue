@@ -249,6 +249,7 @@ export default {
       selectedStatus: '',
       seasons: [],
       episodes: [],
+      medias: [],
       headers : {
           seasons: [
             {
