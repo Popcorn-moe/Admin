@@ -8,6 +8,6 @@ export default {
 }
 </script>
 
-<style>
-
+<style lang="stylus">
+  @import "../stylus/main.styl";
 </style>

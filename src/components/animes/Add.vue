@@ -116,7 +116,7 @@
               </v-card-actions>
             </template>
           </v-date-picker>
-        </v-menu>Date
+        </v-menu>
       </v-flex>
     </v-layout>
     <v-layout>
@@ -163,7 +163,7 @@
 </template>
 
 <script>
-  import { VDataTable, VIcon, VBtn, VDialog, VTextField, VSelect, VChip, VAvatar, VDatePicker, VMenu } from 'vuetify/src/components'
+  import { VIcon, VBtn, VDialog, VTextField, VSelect, VChip, VAvatar, VDatePicker, VMenu } from 'vuetify/src/components'
   import { VList, VListGroup, VListTile, VListTileTitle, VListTileAction, VListTileContent, VListTileAvatar } from 'vuetify/src/components/VList'
   import { VContainer, VFlex, VLayout } from 'vuetify/src/components/VGrid'
   import gql from 'graphql-tag'
@@ -209,7 +209,6 @@
       VContainer,
       VFlex,
       VLayout,
-      VDataTable,
       VIcon,
       VBtn,
       VDialog,

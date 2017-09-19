@@ -56,12 +56,11 @@ export default {
             text: 'Authors',
             align: 'left',
             value: 'authors'
-          },
-          {
+          }, {
             text: 'Tags',
             align: 'left',
             value: 'tags'
-          },{
+          }, {
             text: 'Release Date',
             align: 'left',
             value: 'release_date'
