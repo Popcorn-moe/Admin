@@ -21,6 +21,12 @@
           <td>
             {{ props.item.tags.join(',') }}
           </td>
+          <td>
+            {{ props.item.release_date }}
+          </td>
+          <td>
+            {{ props.item.posted_date }}
+          </td>
           <td align="right">
             <v-btn icon @click.stop="() => removeAnime(props.item)">
               <v-icon>close</v-icon>
@@ -58,11 +64,11 @@ export default {
           },{
             text: 'Release Date',
             align: 'left',
-            value: 'bio'
+            value: 'release_date'
           }, {
             text: 'Posted date',
             align: 'left',
-            value: 'organisation'
+            value: 'posted_date'
           }
         ],
         animes: [],
