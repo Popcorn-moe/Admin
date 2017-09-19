@@ -6,20 +6,19 @@
       </div>
       <v-data-table
         :headers="headers"
-        :items="authors"
+        :items="animes"
         hide-actions
         class="elevation-1"
       >
         <template slot="items" scope="props">
-          <td></td>
           <td>
-            {{ props.item.names.join(',') }}
+            {{ props.item.names.join(', ') }}
           </td>
           <td>
-            {{ props.item.authors }}
+            {{ props.item.authors.map(({ name }) => name ).join(', ') }}
           </td>
           <td>
-            {{ props.item.tags.join(',') }}
+            {{ props.item.tags.map(({ name }) => name ).join(', ') }}
           </td>
           <td>
             {{ props.item.release_date }}
@@ -40,8 +39,9 @@
 
 <script>
 
-import { VDataTable } from 'vuetify/src/components'
+import { VDataTable, VBtn, VIcon } from 'vuetify/src/components'
 import { VContainer, VFlex, VLayout } from 'vuetify/src/components/VGrid'
+import gql from 'graphql-tag'
 
 export default {
   name: "animes_list",
@@ -79,7 +79,15 @@ export default {
     VContainer,
     VFlex,
     VLayout,
-    VDataTable
+    VDataTable,
+    VBtn,
+    VIcon
+  },
+  apollo: {
+    animes: {
+      query: gql`{ animes(limit: 50) { id names authors { name } tags { name } } }`,
+      update: ({ animes }) => animes
+    }
   }
 }
 </script>
