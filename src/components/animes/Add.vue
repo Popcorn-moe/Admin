@@ -124,22 +124,28 @@
         <v-text-field
           label="Cover Link"
           required
+          @input="value => coverFile = value"
+          :value="(coverFile && coverFile.name) ? coverFile.name : coverFile"
         ></v-text-field>
       </v-flex>
       <v-flex xs1>
-        <v-btn icon large primary dark @click.stop="">
+        <v-btn icon large primary dark class="upload-button">
           <v-icon>file_upload</v-icon>
+          <input type="file" @change="setCoverFile">
         </v-btn>
       </v-flex>
       <v-flex xs5>
         <v-text-field
           label="Banner Link"
           required
+          @input="value => bannerFile = value"
+          :value="(bannerFile && bannerFile.name) ? bannerFile.name : bannerFile"
         ></v-text-field>
       </v-flex>
       <v-flex xs1>
-        <v-btn icon large primary dark @click.stop="">
+        <v-btn icon large primary dark class="upload-button">
           <v-icon>file_upload</v-icon>
+          <input type="file" @change="setBannerFile">
         </v-btn>
       </v-flex>
     </v-layout>
@@ -180,7 +186,9 @@
         selectedTags: [],
         selectedAuthors: [],
         animesStatus: [],
-        selectedStatus: ''
+        selectedStatus: '',
+        coverFile: null,
+        bannerFile: null
       }
     },
     methods: {
@@ -195,14 +203,22 @@
               names: this.names.split(',').map(e => e.trim()),
               authors: this.selectedAuthors,
               tags: this.selectedTags,
-              status: this.selectedStatus.toUpperCase(),
+              status: this.selectedStatus.toUpperCase().replace(' ', '_'),
               medias: [],
               season: [],
               desc: this.desc,
+              cover: this.coverFile,
+              background: this.bannerFile,
               release_date: this.date
             }
           }
         })
+      },
+      setCoverFile({ target: { files: [file] }}) {
+        this.coverFile = file;
+      },
+      setBannerFile({ target: { files: [file] }}) {
+        this.bannerFile = file;
       }
     },
     components: {
@@ -260,5 +276,17 @@
 
   .tags-select > .input-group__selections {
     padding-left: 2px !important;
+  }
+
+  .upload-button input[type=file] {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    outline: none;
+    cursor: inherit;
+    display: block;
   }
 </style>
