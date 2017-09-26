@@ -111,7 +111,6 @@ const ADD_NEWS =
 }`
 
 export default {
-  name: "news",
   data() {
     return {
       headers: [
