@@ -329,4 +329,8 @@ export default {
 
 <style lang="stylus">
   @import "../../stylus/main.styl";
+  .flex {
+    padding: 5px;
+  }
+
 </style>

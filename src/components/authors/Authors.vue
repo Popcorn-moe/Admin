@@ -153,8 +153,8 @@ export default {
               id
           }
         })
-        this.deleted = []
       }
+      this.deleted = []
     }
   },
   apollo: {
@@ -167,7 +167,7 @@ export default {
 </script>
 
 <style lang="stylus">
-  @import '../../stylus/main'
+  @import '../../stylus/main.styl';
 
   .author-checkbox {
     width: 28px !important;

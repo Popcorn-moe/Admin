@@ -1,11 +1,12 @@
-import Vue from 'vue'
-import Router from 'vue-router'
-import Index from '../components/Index'
-import Tags from '../components/tags/Tags'
-import Users from '../components/users/Users'
-import Authors from '../components/authors/Authors'
+import Vue from 'vue';
+import Router from 'vue-router';
+import Index from '../components/Index';
+import Tags from '../components/tags/Tags';
+import Users from '../components/users/Users';
+import News from '../components/news/News';
+import Authors from '../components/authors/Authors';
 import { AddAnime, ListAnime, EditAnime } from '../components/animes';
-Vue.use(Router)
+Vue.use(Router);
 
 export const routes = [
   {
@@ -19,6 +20,12 @@ export const routes = [
     path: '/users',
     name: 'Users',
     component: Users
+  },
+  {
+    icon: 'equalizer',
+    path: '/news',
+    name: 'News',
+    component: News
   },
   {
     icon: 'video_library',
@@ -70,7 +77,7 @@ function convert(routes)
   let newRoutes = [];
   routes.forEach((v) =>
   {
-    if(v.hasOwnProperty("submenus"))
+    if(v.submenus)
     {
       v.submenus.forEach((s) => {
         s.path = v.path + s.path;

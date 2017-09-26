@@ -149,8 +149,8 @@ export default {
               id
           }
         })
-        this.deleted = []
       }
+      this.deleted = []
     }
   },
   apollo: {
