@@ -1,5 +1,5 @@
 <template>
-  <div class="news-list">
+  <v-layout class="news-list">
     <v-container>
       <div class="text-xs-center">
         <h2 class="headline">News List</h2>
@@ -21,16 +21,30 @@
             </v-edit-dialog>
           </td>
           <td>
+            <v-layout>
+              <v-flex xs6>
+                <v-btn icon class="main-color" v-if="props.item.cover" :href="props.item.cover">
+                  <v-icon class="white--text">remove_red_eye</v-icon>
+                </v-btn>
+              </v-flex>
+              <v-flex xs6>
+                <v-btn icon class="main-color news-upload-icon">
+                  <v-icon class="white--text">file_upload</v-icon>
+                  <input type="file" @change="$input => changeCover($input, props.item)">
+                </v-btn>
+              </v-flex>
+            </v-layout>
+          </td>
+          <td>
             <v-select
               class="table-select"
               :items="users.map(u => u.login)"
               @input="v => props.item.author.login"
-              :value="me.login"
+              :value="props.item.author.login"
               single-line
             ></v-select>
           </td>
           <td @click.stop="props.item.dialog = !props.item.dialog" class="content_column">
-            {{ props.item.content }}
             <v-dialog v-model="props.item.dialog" width="50%">
               <v-card>
                 <v-card-title class="headline">News Content</v-card-title>
@@ -90,7 +104,7 @@
         </v-flex>
       </v-layout>
     </v-container>
-  </div>
+  </v-layout>
 </template>
 
 <script>
@@ -118,6 +132,10 @@ export default {
           text: 'Names',
           align: 'left',
           value: 'name'
+        }, {
+          text: 'Cover',
+          align: 'left',
+          value: 'cover'
         }, {
           text: 'Author',
           align: 'left',
@@ -158,7 +176,7 @@ export default {
   },
   apollo: {
     news: {
-      query: gql`{ news { id name author { id login group } content }}`,
+      query: gql`{ news { id name author { id login group } content cover }}`,
       update: ({ news }) => news.map(n => Object.assign({ menu: false, dialog: false }, n))
     },
     me: {
@@ -171,6 +189,10 @@ export default {
     }
   },
   methods: {
+    changeCover({ target: { files: [file] }}, data)
+    {
+      this.save({...data, file});
+    },
     addNews() {
       this.news.push({
         name: 'New News',
@@ -187,22 +209,7 @@ export default {
         this.deleted.push(news.id)
     },
     saveNews() {
-      for(const news of this.news) {
-        const { id, name, content, author } = news;
-        this.$apollo.mutate({
-          mutation: id ? UPDATE_NEWS : ADD_NEWS,
-          variables: {
-            id,
-            news: {
-              name,
-              content,
-              author: author.id
-            }
-          }
-        }).then(({data: { id }}) => {
-          news.id = id;
-        })
-      }
+      this.news.forEach(n => this.save(n));
       for(const id of this.deleted) {
         this.$apollo.mutate({
           mutation:
@@ -215,6 +222,24 @@ export default {
         })
       }
       this.deleted = []
+    },
+    save(news) {
+      const { id, name, content, author, file } = news;
+      console.log(id ? "UPDATE" : "ADD", id, name, content, author.id);
+      this.$apollo.mutate({
+        mutation: id ? UPDATE_NEWS : ADD_NEWS,
+        variables: {
+          id,
+          news: {
+            name,
+            content,
+            author: author.id,
+            cover: file
+          }
+        }
+      }).then(({data: { id }}) => {
+        news.id = id;
+      })
     }
   }
 }
@@ -230,11 +255,25 @@ export default {
     }
   }
 
+  .news-upload-icon {
+    input[type=file] {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      outline: none;
+      cursor: inherit;
+      display: block;
+    }
+  }
+
   .content_column {
     white-space: nowrap;
     max-width: 300px;
-    overflow: hidden;              /* "overflow" value must be different from  visible"*/
-    -o-text-overflow: ellipsis;    /* Opera < 11*/
-    text-overflow:    ellipsis;
+    overflow: hidden;
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
   }
 </style>
