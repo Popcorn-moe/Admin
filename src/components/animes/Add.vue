@@ -204,8 +204,6 @@
               authors: this.selectedAuthors,
               tags: this.selectedTags,
               status: this.selectedStatus.toUpperCase().replace(' ', '_'),
-              medias: [],
-              season: [],
               desc: this.desc,
               cover: this.coverFile,
               background: this.bannerFile,
