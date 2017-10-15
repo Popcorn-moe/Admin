@@ -19,6 +19,7 @@
               <v-text-field
                 slot="input"
                 v-model="props.item.email"
+                @change="() => addChange(props.item)"
                 single-line
               ></v-text-field>
             </v-edit-dialog>
@@ -28,6 +29,7 @@
               class="table-select"
               :items="userGroups"
               @input="v => props.item.group = toSnakeCase(v)"
+              @change="() => addChange(props.item)"
               :value="fromSnakeCase(props.item.group)"
               single-line
             ></v-select>
@@ -41,7 +43,7 @@
     </v-data-table>
      <v-layout row wrap>
         <v-flex offset-xs10 xs2 class="text-xs-right">
-          <v-btn primary>
+          <v-btn primary @click.stop="save()">
             Save
           </v-btn>
         </v-flex>
@@ -81,7 +83,8 @@ export default {
       ],
       users: [],
       userGroups: [],
-      deleted: []
+      deleted: [],
+      changed: []
     }
   },
   components: {
@@ -112,6 +115,31 @@ export default {
       this.users.splice(this.users.indexOf(user), 1)
       if (user.id)
         this.deleted.push(tag.id)
+
+      this.changed = this.changed.filter(item => item !== user)
+    },
+    addChange(item) {
+      if(this.changed.includes(item)) return
+      this.changed.push(item)
+    },
+    save() {
+      const changed = this.changed.map(
+        ({ id, avatar, email, login, group }) => {return { id, avatar, email, login, group }}
+      )
+
+      console.log(changed)
+
+      this.$apollo.mutate(
+        {
+          mutation:
+            gql`mutation ($users: [UserInput!]!) {
+                  updateUsers(users: $users)
+                }`,
+          variables: {
+            users: changed
+          }
+        }
+      )
     }
   },
   apollo: {

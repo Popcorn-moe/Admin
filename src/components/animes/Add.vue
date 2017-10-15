@@ -207,7 +207,7 @@
               desc: this.desc,
               cover: this.coverFile,
               background: this.bannerFile,
-              release_date: this.date
+              release_date: this.date + 'T00:00:00Z' //UTC date (midnight greenwich)
             }
           }
         })
