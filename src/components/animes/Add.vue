@@ -44,7 +44,7 @@
               <v-select
                 :items="animesStatus"
                 v-model="selectedStatus"
-                label="Status"
+                solo
               ></v-select>
             </v-flex>
           </v-layout>

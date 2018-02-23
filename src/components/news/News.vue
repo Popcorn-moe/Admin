@@ -247,7 +247,7 @@ export default {
 				name: "New News",
 				author: this.me,
 				posted_date: new Date().toISOString().slice(0, 10),
-				content: "Empty",
+				content: "",
 				menu: false,
 				dialog: false
 			});
@@ -274,7 +274,6 @@ export default {
 		},
 		save(news) {
 			const { id, name, content, author, file } = news;
-			console.log(id ? "UPDATE" : "ADD", id, name, content, author.id);
 			this.$apollo
 				.mutate({
 					mutation: id ? UPDATE_NEWS : ADD_NEWS,
