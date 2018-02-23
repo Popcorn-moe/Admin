@@ -1,6 +1,6 @@
 <template>
-  	<v-toolbar app color="primary">
-		<v-toolbar-side-icon @click.stop="toggleDrawer(!drawer)"></v-toolbar-side-icon>
+  	<v-toolbar app color="primary" class="elevation-0 white--text">
+		<v-toolbar-side-icon class="white--text" @click.stop="toggleDrawer(!drawer)"></v-toolbar-side-icon>
 		<v-toolbar-title>
 			<v-menu offset-y auto>
 				<span slot="activator">{{ $route.meta.parent || $route.name }}</span>
