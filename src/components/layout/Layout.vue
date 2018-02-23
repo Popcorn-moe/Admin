@@ -16,9 +16,9 @@
 <script>
 import { VContent } from "vuetify/es5/components/VGrid";
 import { VSlideYTransition } from "vuetify/es5/components/transitions";
-import { mapGetters, mapActions } from "vuex";
 import Navbar from "./Navbar";
 import Toolbar from "./Toolbar";
+import { mapGetters, mapActions } from "vuex";
 
 export default {
 	components: {

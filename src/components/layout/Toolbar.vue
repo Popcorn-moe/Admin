@@ -9,7 +9,7 @@
 						class="main-color"
 						v-for="route in routes"
 						:key="route.name"
-						@click="$router.push({ name: route.name })"
+						@click="$router.push(route.path)"
 					>
 						<v-list-tile-title>{{ route.name }}</v-list-tile-title>
 					</v-list-tile>
@@ -52,6 +52,7 @@ import {
 } from "vuetify/es5/components/VList";
 import { routes } from "../../router";
 import gql from "graphql-tag";
+import { mapGetters, mapActions } from "vuex";
 
 export default {
 	data() {
@@ -62,6 +63,12 @@ export default {
 			}
 		};
 	},
+	computed: mapGetters({
+		drawer: "drawer"
+	}),
+	methods: mapActions({
+		toggleDrawer: "toggleDrawer"
+	}),
 	apollo: {
 		me: {
 			query: gql`

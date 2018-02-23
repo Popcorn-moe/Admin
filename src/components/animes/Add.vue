@@ -139,6 +139,11 @@ import {
 	VChip,
 	VSubheader
 } from "vuetify/es5/components";
+import {
+	VListTileContent,
+	VListTileAvatar,
+	VListTileTitle
+} from "vuetify/es5/components/VList";
 import { VContainer, VFlex, VLayout } from "vuetify/es5/components/VGrid";
 import * as VStepper from "vuetify/es5/components/VStepper";
 import { mavonEditor as MavonEditor } from "mavon-editor";
@@ -149,7 +154,11 @@ export default {
 		return {
 			el: 0,
 			names: [],
-			desc: ""
+			desc: "",
+			authors: [],
+			selectedAuthors: [],
+			tags: [],
+			selectedTags: []
 		};
 	},
 	methods: {
@@ -192,9 +201,12 @@ export default {
 		VFlex,
 		VLayout,
 		VDivider,
-		...VStepper,
 		MavonEditor,
-		VSubheader
+		VSubheader,
+		VListTileContent,
+		VListTileAvatar,
+		VListTileTitle,
+		...VStepper
 	},
 	apollo: {
 		animesStatus: {
