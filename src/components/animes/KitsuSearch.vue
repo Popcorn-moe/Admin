@@ -53,7 +53,7 @@ export default {
 	},
 	methods: {
 		queryKitsu(value) {
-			kitsuMedia
+			this.promise = kitsuMedia
 				.search(value, {
 					attributesToRetrieve: ["canonicalTitle", "posterImage", "id"],
 					hitsPerPage: 6
@@ -61,8 +61,7 @@ export default {
 				.then(({ hits }) => (this.items = hits));
 		},
 		select(item) {
-			this.search = null;
-			this.items = [];
+			this.promise.then(() => (this.search = null));
 			fetch(`https://kitsu.io/api/edge/anime/${item.id}`)
 				.then(res => res.json())
 				.then(({ data: { attributes } }) => this.$emit("input", attributes));
