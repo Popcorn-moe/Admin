@@ -15,7 +15,7 @@
 					</v-list-tile>
 				</v-list>
 			</v-menu>
-			<span v-if="$route.meta.parent">/</span>
+			<span style="vertical-align: middle;" v-if="$route.meta.parent">/</span>
 			<v-menu v-if="$route.meta.parent" offset-y auto>
 				<span slot="activator">{{ $route.name }}</span>
 				<v-list class="main-color" style="max-height: 200px; width: 100px;">
