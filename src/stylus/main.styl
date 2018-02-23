@@ -1,46 +1,15 @@
-@import '~simplemde/dist/simplemde.min.css';
 @import './theme'
 @import '~vuetify/src/stylus/app'
 @import './transitions'
+@import './mavon'
 
 .no-margin {
   margin: 0;
 }
 
-.application--dark {
+.application.theme--dark {
   h1, h2, h3, h4, h5, h6 {
     color: #D3D3D3;
-  }
-
-  .markdown-editor {
-    .editor-toolbar {
-      border: none;
-      border-top: 1px solid #bbb;
-      border-radius: 0;
-
-      a {
-        color: #fff !important;
-        background-color: #424242 !important;
-      }
-    }
-
-    .fullscreen {
-      background-color: #424242 !important;
-
-      &::before, &::after {
-        background: none;
-      }
-    }
-
-    .CodeMirror, .editor-preview, .editor-preview-side {
-      border: none;
-      background-color: #303030;
-      color: #fff
-    }
-
-    .editor-preview-side {
-      background-color: #454545;
-    }
   }
 }
 

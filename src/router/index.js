@@ -6,6 +6,7 @@ import Users from "../components/users/Users";
 import News from "../components/news/News";
 import Authors from "../components/authors/Authors";
 import { AddAnime, ListAnime, EditAnime } from "../components/animes";
+
 Vue.use(Router);
 
 export const routes = [
@@ -75,11 +76,13 @@ const router = new Router({
 function convert(routes) {
 	let newRoutes = [];
 	routes.forEach(v => {
+		v.meta = {};
 		if (v.submenus) {
 			v.submenus.forEach(s => {
 				s.path = v.path + s.path;
 				s.meta = {};
-				s.meta.totalname = v.name + " > " + s.name;
+				s.meta.parent = v.name;
+				s.meta.submenus = v.submenus.map(s => s.name);
 				newRoutes.push(s);
 			});
 		} else newRoutes.push(v);

@@ -120,7 +120,7 @@ export default {
   @import '../../stylus/main.styl';
 
   .nav-content {
-    min-height: calc(100vh - 53px) !important;
+    min-height: calc(100vh - 63px) !important;
     overflow-y: auto;
   }
 

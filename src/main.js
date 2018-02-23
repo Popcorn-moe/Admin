@@ -5,6 +5,7 @@ import store from "./store";
 import apolloProvider from "./graphql";
 import { Vuetify } from "vuetify/es5/components";
 import colors from "vuetify/es5/util/colors";
+import "mavon-editor/dist/css/index.css";
 
 Vue.config.productionTip = false;
 Vue.use(Vuetify, {
