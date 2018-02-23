@@ -10,7 +10,7 @@
     >
       <v-toolbar-title class="mx-auto" slot="extension">
           <span>Welcome to Popcorn.moe Admin</span>
-          <h2 class="white--text">All abuses starts from here</h2>
+          <h2 class="white--text">All abuses start's from here</h2>
           <v-layout row>
               <v-flex wrap>
                 <v-btn outline large fab color="white" class="outine-2" :to="{ name: 'Users' }">

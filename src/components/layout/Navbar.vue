@@ -120,8 +120,19 @@ export default {
   @import '../../stylus/main.styl';
 
   .nav-content {
-    min-height: calc(100vh - 63px) !important;
+    min-height: calc(100% - 63px) !important;
     overflow-y: auto;
+  }
+  .navigation-drawer {
+    padding-bottom: 0 !important;
+  }
+
+  .badge__badge {
+    right: -10px !important;
+    top: -7px
+    width: 18px;
+    height: 18px;
+    line-height: 18px;
   }
 
   .bottom {
@@ -133,13 +144,6 @@ export default {
     .input-group {
       padding: 9px 0;
     }
-  }
-
-  .router-link {
-    text-decoration: none;
-    &.router-link-exact-active * {
-       color: $main-color !important;
-     }
   }
 
 </style>

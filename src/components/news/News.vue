@@ -42,10 +42,11 @@
             ></v-select>
           </td>
           <td @click.stop="props.item.dialog = !props.item.dialog" class="content_column">
+            Click to edit
             <v-dialog v-model="props.item.dialog" width="50%">
               <v-card>
                 <v-card-title class="headline">News Content</v-card-title>
-                <markdown-editor v-model="props.item.content"></markdown-editor>
+                <mavon-editor language="en" v-model="props.item.content"></mavon-editor>
                 <v-spacer></v-spacer>
                 <v-btn primary @click.native="props.item.dialog = false">Save</v-btn>
                 <v-btn class="green--text darken-1" flat="flat" @click.native="props.item.dialog = false">Cancel</v-btn>
@@ -123,7 +124,7 @@ import {
 	VLayout,
 	VSpacer
 } from "vuetify/es5/components/VGrid";
-import markdownEditor from "vue-simplemde/src/markdown-editor";
+import { mavonEditor as MavonEditor } from "mavon-editor";
 import gql from "graphql-tag";
 
 const UPDATE_NEWS = gql`
@@ -189,7 +190,7 @@ export default {
 		VCard,
 		VSpacer,
 		VCardTitle,
-		markdownEditor
+		MavonEditor
 	},
 	apollo: {
 		news: {
