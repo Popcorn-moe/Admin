@@ -27,6 +27,7 @@
 				]
 		},
 		"dependencies": {
+				"algoliasearch": "^3.24.11",
 				"apollo-client": "^1.9.3",
 				"graphql-tag": "^2.8.0",
 				"mavon-editor": "^2.4.16",

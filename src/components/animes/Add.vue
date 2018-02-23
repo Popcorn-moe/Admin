@@ -1,8 +1,10 @@
 <template>
-  <v-container>
+  <v-container class="add-container">
+    <v-progress-circular v-if="load" class="add-progress" indeterminate color="primary" :size="50"></v-progress-circular>
+    <div class="overlay overlay--active" v-if="load"></div>
     <v-stepper v-model="el">
       <v-stepper-header>
-        <v-stepper-step step="1" :complete="el > 1">Names and Description</v-stepper-step>
+        <v-stepper-step step="1" :complete="el > 1">Names, Description, Status</v-stepper-step>
         <v-divider></v-divider>
         <v-stepper-step step="2" :complete="el > 2">Cover and Banner</v-stepper-step>
         <v-divider></v-divider>
@@ -10,9 +12,10 @@
       </v-stepper-header>
       <v-stepper-items>
         <v-stepper-content step="1">
-          <v-subheader inset>Names</v-subheader>
+          <kitsu-search @input="selectKitsu"></kitsu-search>
           <v-layout row wrap>
-            <v-flex offset-md2 md8>
+            <v-flex md8>
+              <v-subheader>Names</v-subheader>
               <v-select
                 label="Names"
                 chips
@@ -36,10 +39,18 @@
                 </template>
               </v-select>
             </v-flex>
+            <v-flex offset-md1 md2>
+              <v-subheader>Status</v-subheader>
+              <v-select
+                :items="animesStatus"
+                v-model="selectedStatus"
+                label="Status"
+              ></v-select>
+            </v-flex>
           </v-layout>
-          <v-subheader inset>Description</v-subheader>
           <v-layout row wrap>
             <v-flex class="text-md-center">
+              <v-subheader>Description</v-subheader>
               <mavon-editor language="en" v-model="desc"></mavon-editor>
             </v-flex>
           </v-layout>
@@ -47,6 +58,8 @@
           <v-btn flat>Cancel</v-btn>
         </v-stepper-content>
         <v-stepper-content step="2">
+          <preview :value="poster" alt="poster"></preview>
+          <preview :value="cover" alt="cover"></preview>
           <v-btn color="primary" @click.native="el = 1">Return</v-btn>
           <v-btn color="primary" @click.native="el = 3">Continue</v-btn>
           <v-btn flat>Cancel</v-btn>
@@ -123,7 +136,7 @@
             </v-flex>
           </v-layout>
           <v-btn color="primary" @click.native="el = 2">Return</v-btn>
-          <v-btn color="primary">Finish</v-btn>
+          <v-btn color="primary" @click.native="addAnime">Finish</v-btn>
           <v-btn flat>Cancel</v-btn>
         </v-stepper-content>
       </v-stepper-items>
@@ -137,7 +150,11 @@ import {
 	VDivider,
 	VSelect,
 	VChip,
-	VSubheader
+	VSubheader,
+	VProgressCircular,
+	VTextField,
+	VDialog,
+	VCard
 } from "vuetify/es5/components";
 import {
 	VListTileContent,
@@ -147,50 +164,88 @@ import {
 import { VContainer, VFlex, VLayout } from "vuetify/es5/components/VGrid";
 import * as VStepper from "vuetify/es5/components/VStepper";
 import { mavonEditor as MavonEditor } from "mavon-editor";
+import KitsuSearch from "./KitsuSearch.vue";
+import Preview from "./Preview.vue";
 import gql from "graphql-tag";
 
 export default {
 	data() {
 		return {
+			load: false,
 			el: 0,
 			names: [],
 			desc: "",
 			authors: [],
 			selectedAuthors: [],
 			tags: [],
-			selectedTags: []
+			selectedTags: [],
+			selectedStatus: "Finished",
+			date: null,
+			cover: null,
+			poster: null
 		};
 	},
 	methods: {
+		selectKitsu(item) {
+			this.names = Object.values(item.titles);
+			this.desc = item.synopsis;
+			// TODO use trailer item.youtubeVideoId
+			switch (item.status) {
+				case "finished":
+					this.selectedStatus = "Finished";
+					break;
+				case "current":
+					this.selectedStatus = "Pending";
+					break;
+				default:
+					this.selectedStatus = "Not Started";
+					break;
+			}
+			this.date = item.startDate;
+			this.load = true;
+			Promise.all([
+				item.coverImage &&
+					fetch(
+						`https://cors-anywhere.herokuapp.com/${item.coverImage.original}`
+					)
+						.then(res => res.blob())
+						.then(blob => (this.cover = blob)),
+				fetch(
+					`https://cors-anywhere.herokuapp.com/${item.posterImage.original}`
+				)
+					.then(res => res.blob())
+					.then(blob => (this.poster = blob))
+			]).then(_ => (this.load = false));
+		},
 		removeName(name) {
 			this.names.splice(this.names.indexOf(name), 1);
 		},
 		addAnime() {
-			this.$apollo.mutate({
-				mutation: gql`
-					mutation($anime: AnimeInput!) {
-						addAnime(anime: $anime)
+			this.load = true;
+			this.$apollo
+				.mutate({
+					mutation: gql`
+						mutation($anime: AnimeInput!) {
+							addAnime(anime: $anime)
+						}
+					`,
+					variables: {
+						anime: {
+							names: this.names.map(e => e.trim()),
+							authors: this.selectedAuthors,
+							tags: this.selectedTags,
+							status: this.selectedStatus.toUpperCase().replace(" ", "_"),
+							desc: this.desc,
+							cover: this.cover,
+							background: this.poster,
+							release_date: this.date + "T00:00:00Z" //UTC date (midnight greenwich)
+						}
 					}
-				`,
-				variables: {
-					anime: {
-						names: this.names.split(",").map(e => e.trim()),
-						authors: this.selectedAuthors,
-						tags: this.selectedTags,
-						status: this.selectedStatus.toUpperCase().replace(" ", "_"),
-						desc: this.desc,
-						cover: this.coverFile,
-						background: this.bannerFile,
-						release_date: this.date + "T00:00:00Z" //UTC date (midnight greenwich)
-					}
-				}
-			});
-		},
-		setCoverFile({ target: { files: [file] } }) {
-			this.coverFile = file;
-		},
-		setBannerFile({ target: { files: [file] } }) {
-			this.bannerFile = file;
+				})
+				.then(_ => {
+					this.load = false;
+					this.$router.push({ name: "List" });
+				}, _ => (this.load = false));
 		}
 	},
 	components: {
@@ -206,7 +261,13 @@ export default {
 		VListTileContent,
 		VListTileAvatar,
 		VListTileTitle,
-		...VStepper
+		VProgressCircular,
+		VTextField,
+		...VStepper,
+		KitsuSearch,
+		VDialog,
+		VCard,
+		Preview
 	},
 	apollo: {
 		animesStatus: {
@@ -275,5 +336,17 @@ export default {
     outline: none;
     cursor: inherit;
     display: block;
+  }
+
+  .add-container {
+    position: relative;
+
+    .add-progress {
+      position: absolute;
+      z-index: 21;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
   }
 </style>
