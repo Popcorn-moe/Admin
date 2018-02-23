@@ -9,7 +9,7 @@
       hide-actions
       class="elevation-1"
     >
-      <template slot="items" scope="props">
+      <template slot="items" slot-scope="props">
           <td></td>
          <td>
             <v-edit-dialog lazy> {{ props.item.name }}
@@ -60,110 +60,134 @@
 </template>
 
 <script>
-import { VDataTable, VIcon, VBtn, VDialog, VTextField, VCheckbox } from 'vuetify/src/components'
-import VEditDialog from 'vuetify/src/components/VDataTable/VEditDialog'
-import { VContainer, VFlex, VLayout } from 'vuetify/src/components/VGrid'
-import gql from 'graphql-tag'
+import {
+	VDataTable,
+	VIcon,
+	VBtn,
+	VDialog,
+	VTextField,
+	VCheckbox
+} from "vuetify/es5/components";
+import VEditDialog from "vuetify/es5/components/VDataTable/VEditDialog";
+import { VContainer, VFlex, VLayout } from "vuetify/es5/components/VGrid";
+import gql from "graphql-tag";
 
-const UPDATE_AUTHOR =
-gql`mutation ($id: ID!, $author: AuthorUpdate!) {
-  id: updateAuthor(id: $id, author: $author)
-}`
-const ADD_AUTHOR =
-gql`mutation ($author: AuthorInput!) {
-  id: addAuthor(author: $author)
-}`
+const UPDATE_AUTHOR = gql`
+	mutation($id: ID!, $author: AuthorUpdate!) {
+		id: updateAuthor(id: $id, author: $author)
+	}
+`;
+const ADD_AUTHOR = gql`
+	mutation($author: AuthorInput!) {
+		id: addAuthor(author: $author)
+	}
+`;
 export default {
-  data() {
-    return {
-      headers: [
-        {
-          text: 'Picture',
-          align: 'left',
-          sortable: false,
-          value: 'picture'
-        }, {
-          text: 'Name',
-          align: 'left',
-          value: 'name'
-        },{
-          text: 'Bio',
-          align: 'left',
-          value: 'bio'
-        }, {
-          text: 'Organisation',
-          align: 'left',
-          value: 'organisation'
-        }
-      ],
-      authors: [],
-      deleted: []
-    }
-  },
-  components: {
-    VContainer,
-    VFlex,
-    VLayout,
-    VDataTable,
-    VIcon,
-    VBtn,
-    VDialog,
-    VEditDialog,
-    VTextField,
-    VCheckbox
-  },
-  methods: {
-    removeAuthor(author) {
-      this.authors.splice(this.authors.indexOf(author), 1)
-      if (author.id)
-        this.deleted.push(author.id)
-    },
-    addAuthor() {
-      this.authors.push({
-        name: 'New Author',
-        bio: 'An Author',
-        organisation: false
-      })
-    },
-    saveAuthors() {
-      for(const author of this.authors) {
-        const { id, name, picture, bio, organisation } = author
-        this.$apollo.mutate({
-          mutation: id ? UPDATE_AUTHOR : ADD_AUTHOR,
-          variables: {
-              id,
-              author: {
-                name,
-                picture,
-                bio,
-                organisation
-              }
-          }
-        }).then(({data: { id }}) => {
-          author.id = id;
-        })
-      }
-      for(const id of this.deleted) {
-        this.$apollo.mutate({
-          mutation:
-            gql`mutation ($id: ID!) {
-                  deleteAuthor(id: $id)
-                }`,
-          variables: {
-              id
-          }
-        })
-      }
-      this.deleted = []
-    }
-  },
-  apollo: {
-    authors: {
-        query: gql`{ authors { id name picture bio organisation } }`,
-        update: ({ authors }) => authors.map(author => Object.assign({}, author)) //Clone to avoid seal
-    }
-  }
-}
+	data() {
+		return {
+			headers: [
+				{
+					text: "Picture",
+					align: "left",
+					sortable: false,
+					value: "picture"
+				},
+				{
+					text: "Name",
+					align: "left",
+					value: "name"
+				},
+				{
+					text: "Bio",
+					align: "left",
+					value: "bio"
+				},
+				{
+					text: "Organisation",
+					align: "left",
+					value: "organisation"
+				}
+			],
+			authors: [],
+			deleted: []
+		};
+	},
+	components: {
+		VContainer,
+		VFlex,
+		VLayout,
+		VDataTable,
+		VIcon,
+		VBtn,
+		VDialog,
+		VEditDialog,
+		VTextField,
+		VCheckbox
+	},
+	methods: {
+		removeAuthor(author) {
+			this.authors.splice(this.authors.indexOf(author), 1);
+			if (author.id) this.deleted.push(author.id);
+		},
+		addAuthor() {
+			this.authors.push({
+				name: "New Author",
+				bio: "An Author",
+				organisation: false
+			});
+		},
+		saveAuthors() {
+			for (const author of this.authors) {
+				const { id, name, picture, bio, organisation } = author;
+				this.$apollo
+					.mutate({
+						mutation: id ? UPDATE_AUTHOR : ADD_AUTHOR,
+						variables: {
+							id,
+							author: {
+								name,
+								picture,
+								bio,
+								organisation
+							}
+						}
+					})
+					.then(({ data: { id } }) => {
+						author.id = id;
+					});
+			}
+			for (const id of this.deleted) {
+				this.$apollo.mutate({
+					mutation: gql`
+						mutation($id: ID!) {
+							deleteAuthor(id: $id)
+						}
+					`,
+					variables: {
+						id
+					}
+				});
+			}
+			this.deleted = [];
+		}
+	},
+	apollo: {
+		authors: {
+			query: gql`
+				{
+					authors {
+						id
+						name
+						picture
+						bio
+						organisation
+					}
+				}
+			`,
+			update: ({ authors }) => authors.map(author => Object.assign({}, author)) //Clone to avoid seal
+		}
+	}
+};
 </script>
 
 <style lang="stylus">

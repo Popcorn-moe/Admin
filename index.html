@@ -3,12 +3,26 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Popcorn.moe - Admin</title>
+    <title>Popcorn.moe</title>
     <link href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons' rel="stylesheet" type="text/css">
-    <link href='/app.css' rel="stylesheet" type="text/css">
   </head>
-  <body>
-    <div id="app"></div>
-    <script src="/app.js"></script>
+  <body style="margin: 0">
+    <div id="app">
+      <style>
+        #root {
+          height: 25%;
+          width: 25%;
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+        }
+      </style>
+      ${require('html-loader!./src/assets/loader.svg')}
+      <script>
+        if (localStorage.getItem('darkTheme') === 'true')
+          document.getElementById('app').style = 'background: #111111;height: 100vh;';
+      </script>
+    </div>
   </body>
 </html>

@@ -9,7 +9,7 @@
       hide-actions
       class="elevation-1"
     >
-      <template slot="items" scope="props">
+      <template slot="items" slot-scope="props">
          <td>
             <v-edit-dialog lazy> {{ props.item.name }}
               <v-text-field
@@ -29,7 +29,7 @@
             </v-edit-dialog>
           </td>
           <td>
-            <v-dialog lazy>
+            <v-dialog lazy max-width="290">
               <div
                 slot="activator"
                 class="color-result"
@@ -61,105 +61,126 @@
 </template>
 
 <script>
-import { VDataTable, VIcon, VBtn, VDialog, VTextField } from 'vuetify/src/components'
-import VEditDialog from 'vuetify/src/components/VDataTable/VEditDialog'
-import { VContainer, VFlex, VLayout } from 'vuetify/src/components/VGrid'
-import ColorPicker from 'vue-color/src/components/Chrome.vue'
-import gql from 'graphql-tag'
+import {
+	VDataTable,
+	VIcon,
+	VBtn,
+	VDialog,
+	VTextField
+} from "vuetify/es5/components";
+import VEditDialog from "vuetify/es5/components/VDataTable/VEditDialog";
+import { VContainer, VFlex, VLayout } from "vuetify/es5/components/VGrid";
+import ColorPicker from "vue-color/src/components/Chrome.vue";
+import gql from "graphql-tag";
 
-const UPDATE_TAG =
-gql`mutation ($id: ID!, $tag: TagUpdate!) {
-  id: updateTag(id: $id, tag: $tag)
-}`
-const ADD_TAG =
-gql`mutation ($tag: TagInput!) {
-  id: addTag(tag: $tag)
-}`
+const UPDATE_TAG = gql`
+	mutation($id: ID!, $tag: TagUpdate!) {
+		id: updateTag(id: $id, tag: $tag)
+	}
+`;
+const ADD_TAG = gql`
+	mutation($tag: TagInput!) {
+		id: addTag(tag: $tag)
+	}
+`;
 export default {
-  data() {
-    return {
-      headers: [
-        {
-          text: 'Name',
-          align: 'left',
-          value: 'name'
-        }, {
-          text: 'Description',
-          align: 'left',
-          value: 'desc'
-        }, {
-          text: 'Color',
-          align: 'left',
-          value: 'color'
-        },
-      ],
-      tags: [],
-      deleted: []
-    }
-  },
-  components: {
-    VContainer,
-    VFlex,
-    VLayout,
-    VDataTable,
-    VIcon,
-    VBtn,
-    VDialog,
-    VEditDialog,
-    VTextField,
-    ColorPicker
-  },
-  methods: {
-    removeTag(tag) {
-      this.tags.splice(this.tags.indexOf(tag), 1)
-      if (tag.id)
-        this.deleted.push(tag.id)
-    },
-    addTag() {
-      this.tags.push({
-        name: 'New tag',
-        desc: 'Description',
-        color: '#000000'
-      })
-    },
-    saveTags() {
-      for(const tag of this.tags) {
-        const { id, name, desc, color } = tag
-        this.$apollo.mutate({
-          mutation: id ? UPDATE_TAG : ADD_TAG,
-          variables: {
-              id,
-              tag: {
-                name,
-                desc,
-                color
-              }
-          }
-        }).then(({data: { id }}) => {
-          tag.id = id;
-        })
-      }
-      for(const id of this.deleted) {
-        this.$apollo.mutate({
-          mutation:
-            gql`mutation ($id: ID!) {
-                  deleteTag(id: $id)
-                }`,
-          variables: {
-              id
-          }
-        })
-      }
-      this.deleted = []
-    }
-  },
-  apollo: {
-    tags: {
-        query: gql`{ tags { id name desc color } }`,
-        update: ({ tags }) => tags.map(tag => Object.assign({}, tag)) //Clone to avoid seal
-    }
-  }
-}
+	data() {
+		return {
+			headers: [
+				{
+					text: "Name",
+					align: "left",
+					value: "name"
+				},
+				{
+					text: "Description",
+					align: "left",
+					value: "desc"
+				},
+				{
+					text: "Color",
+					align: "left",
+					value: "color"
+				}
+			],
+			tags: [],
+			deleted: []
+		};
+	},
+	components: {
+		VContainer,
+		VFlex,
+		VLayout,
+		VDataTable,
+		VIcon,
+		VBtn,
+		VDialog,
+		VEditDialog,
+		VTextField,
+		ColorPicker
+	},
+	methods: {
+		removeTag(tag) {
+			this.tags.splice(this.tags.indexOf(tag), 1);
+			if (tag.id) this.deleted.push(tag.id);
+		},
+		addTag() {
+			this.tags.push({
+				name: "New tag",
+				desc: "Description",
+				color: "#000000"
+			});
+		},
+		saveTags() {
+			for (const tag of this.tags) {
+				const { id, name, desc, color } = tag;
+				this.$apollo
+					.mutate({
+						mutation: id ? UPDATE_TAG : ADD_TAG,
+						variables: {
+							id,
+							tag: {
+								name,
+								desc,
+								color
+							}
+						}
+					})
+					.then(({ data: { id } }) => {
+						tag.id = id;
+					});
+			}
+			for (const id of this.deleted) {
+				this.$apollo.mutate({
+					mutation: gql`
+						mutation($id: ID!) {
+							deleteTag(id: $id)
+						}
+					`,
+					variables: {
+						id
+					}
+				});
+			}
+			this.deleted = [];
+		}
+	},
+	apollo: {
+		tags: {
+			query: gql`
+				{
+					tags {
+						id
+						name
+						desc
+						color
+					}
+				}
+			`,
+			update: ({ tags }) => tags.map(tag => Object.assign({}, tag)) //Clone to avoid seal
+		}
+	}
+};
 </script>
 
 <style lang="stylus">

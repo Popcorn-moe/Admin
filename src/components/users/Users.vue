@@ -9,7 +9,7 @@
       hide-actions
       class="elevation-1"
     >
-      <template slot="items" scope="props">
+      <template slot="items" slot-scope="props">
           <td>
             <img class="user-avatar" :src="props.item.avatar">
           </td>
@@ -52,115 +52,141 @@
 </template>
 
 <script>
-import { VDataTable, VIcon, VBtn, VTextField, VSelect } from 'vuetify/src/components'
-import VEditDialog from 'vuetify/src/components/VDataTable/VEditDialog'
-import { VContainer, VFlex, VLayout } from 'vuetify/src/components/VGrid'
-import gql from 'graphql-tag'
+import {
+	VDataTable,
+	VIcon,
+	VBtn,
+	VTextField,
+	VSelect
+} from "vuetify/es5/components";
+import VEditDialog from "vuetify/es5/components/VDataTable/VEditDialog";
+import { VContainer, VFlex, VLayout } from "vuetify/es5/components/VGrid";
+import gql from "graphql-tag";
 
 export default {
-  data() {
-    return {
-      headers: [
-        {
-          text: 'Avatar',
-          align: 'left',
-          sortable: false,
-          value: 'avatar'
-        },
-        {
-          text: 'Login',
-          align: 'left',
-          value: 'name'
-        }, {
-          text: 'Email',
-          align: 'left',
-          value: 'email'
-        }, {
-          text: 'Group',
-          align: 'left',
-          value: 'group'
-        },
-      ],
-      users: [],
-      userGroups: [],
-      deleted: [],
-      changed: []
-    }
-  },
-  components: {
-    VContainer,
-    VFlex,
-    VLayout,
-    VDataTable,
-    VIcon,
-    VBtn,
-    VEditDialog,
-    VTextField,
-    VSelect
-  },
-  methods: {
-    fromSnakeCase(value) {
-      if(!value) return ''
-      return value.split('_').map(w => this.capitalize(w)).join(' ')
-    },
-    toSnakeCase(value) {
-      if(!value) return ''
-      return value.split(' ').map(w => w.toUpperCase()).join('_')
-    },
-    capitalize(value) {
-      if(!value) return ''
-      return value.charAt(0).toUpperCase() + value.slice(1).toLowerCase()
-    },
-    removeUser(user) {
-      this.users.splice(this.users.indexOf(user), 1)
-      if (user.id)
-        this.deleted.push(tag.id)
+	data() {
+		return {
+			headers: [
+				{
+					text: "Avatar",
+					align: "left",
+					sortable: false,
+					value: "avatar"
+				},
+				{
+					text: "Login",
+					align: "left",
+					value: "name"
+				},
+				{
+					text: "Email",
+					align: "left",
+					value: "email"
+				},
+				{
+					text: "Group",
+					align: "left",
+					value: "group"
+				}
+			],
+			users: [],
+			userGroups: [],
+			deleted: [],
+			changed: []
+		};
+	},
+	components: {
+		VContainer,
+		VFlex,
+		VLayout,
+		VDataTable,
+		VIcon,
+		VBtn,
+		VEditDialog,
+		VTextField,
+		VSelect
+	},
+	methods: {
+		fromSnakeCase(value) {
+			if (!value) return "";
+			return value
+				.split("_")
+				.map(w => this.capitalize(w))
+				.join(" ");
+		},
+		toSnakeCase(value) {
+			if (!value) return "";
+			return value
+				.split(" ")
+				.map(w => w.toUpperCase())
+				.join("_");
+		},
+		capitalize(value) {
+			if (!value) return "";
+			return value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
+		},
+		removeUser(user) {
+			this.users.splice(this.users.indexOf(user), 1);
+			if (user.id) this.deleted.push(tag.id);
 
-      this.changed = this.changed.filter(item => item !== user)
-    },
-    addChange(item) {
-      if(this.changed.includes(item)) return
-      this.changed.push(item)
-    },
-    save() {
-      const changed = this.changed.map(
-        ({ id, avatar, email, login, group }) => {return { id, avatar, email, login, group }}
-      )
+			this.changed = this.changed.filter(item => item !== user);
+		},
+		addChange(item) {
+			if (this.changed.includes(item)) return;
+			this.changed.push(item);
+		},
+		save() {
+			const changed = this.changed.map(
+				({ id, avatar, email, login, group }) => {
+					return { id, avatar, email, login, group };
+				}
+			);
 
-      console.log(changed)
+			console.log(changed);
 
-      this.$apollo.mutate(
-        {
-          mutation:
-            gql`mutation ($users: [UserInput!]!) {
-                  updateUsers(users: $users)
-                }`,
-          variables: {
-            users: changed
-          }
-        }
-      )
-    }
-  },
-  apollo: {
-    users: {
-        query: gql`{ users { id avatar email login group } }`,
-        update: ({ users }) => users.map(user => Object.assign({}, user)) //Clone to avoid seal
-    },
-    userGroups: {
-      query: gql`{
-        __type(name: "UserGroup") {
-          enumValues {
-            name
-          }
-        }
-      }`,
-      update({ __type: { enumValues }}) {
-        return enumValues.map(e => this.fromSnakeCase(e.name))
-      }
-    }
-  }
-}
+			this.$apollo.mutate({
+				mutation: gql`
+					mutation($users: [UserInput!]!) {
+						updateUsers(users: $users)
+					}
+				`,
+				variables: {
+					users: changed
+				}
+			});
+		}
+	},
+	apollo: {
+		users: {
+			query: gql`
+				{
+					users {
+						id
+						avatar
+						email
+						login
+						group
+					}
+				}
+			`,
+			update: ({ users }) => users.map(user => Object.assign({}, user)) //Clone to avoid seal
+		},
+		userGroups: {
+			query: gql`
+				{
+					__type(name: "UserGroup") {
+						enumValues {
+							name
+						}
+					}
+				}
+			`,
+			update({ __type: { enumValues } }) {
+				return enumValues.map(e => this.fromSnakeCase(e.name));
+			}
+		}
+	}
+};
 </script>
 
 <style lang="stylus">

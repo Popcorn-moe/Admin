@@ -10,7 +10,7 @@
         hide-actions
         class="elevation-1"
       >
-        <template slot="items" scope="props">
+        <template slot="items" slot-scope="props">
           <td>
             <v-edit-dialog lazy> {{ props.item.name }}
               <v-text-field
@@ -75,7 +75,7 @@
                 readonly
               ></v-text-field>
               <v-date-picker v-model="props.item.posted_date" no-title scrollable actions>
-                <template scope="{ save, cancel }">
+                <template slot-scope="{ save, cancel }">
                   <div class="card__actions">
                     <v-btn flat primary @click.native="cancel()">Cancel</v-btn>
                     <v-btn flat primary @click.native="save()">Save</v-btn>
@@ -108,141 +108,194 @@
 </template>
 
 <script>
-import { VDataTable, VBtn, VIcon, VDialog, VTextField, VSelect, VDatePicker, VMenu } from 'vuetify/src/components'
-import { VCard, VCardTitle } from 'vuetify/src/components/VCard'
-import VEditDialog from 'vuetify/src/components/VDataTable/VEditDialog'
-import { VContainer, VFlex, VLayout, VSpacer } from 'vuetify/src/components/VGrid'
-import markdownEditor from 'vue-simplemde/src/markdown-editor'
-import gql from 'graphql-tag'
+import {
+	VDataTable,
+	VBtn,
+	VIcon,
+	VDialog,
+	VTextField,
+	VSelect,
+	VDatePicker,
+	VMenu
+} from "vuetify/es5/components";
+import { VCard, VCardTitle } from "vuetify/es5/components/VCard";
+import VEditDialog from "vuetify/es5/components/VDataTable/VEditDialog";
+import {
+	VContainer,
+	VFlex,
+	VLayout,
+	VSpacer
+} from "vuetify/es5/components/VGrid";
+import markdownEditor from "vue-simplemde/src/markdown-editor";
+import gql from "graphql-tag";
 
-const UPDATE_NEWS =
-  gql`mutation ($id: ID!, $news: NewsUpdate!) {
-  id: updateNews(id: $id, news: $news)
-}`
-const ADD_NEWS =
-  gql`mutation ($news: NewsInput!) {
-  id: addNews(news: $news)
-}`
+const UPDATE_NEWS = gql`
+	mutation($id: ID!, $news: NewsUpdate!) {
+		id: updateNews(id: $id, news: $news)
+	}
+`;
+const ADD_NEWS = gql`
+	mutation($news: NewsInput!) {
+		id: addNews(news: $news)
+	}
+`;
 
 export default {
-  data() {
-    return {
-      headers: [
-        {
-          text: 'Names',
-          align: 'left',
-          value: 'name'
-        }, {
-          text: 'Cover',
-          align: 'left',
-          value: 'cover'
-        }, {
-          text: 'Author',
-          align: 'left',
-          value: 'author'
-        }, {
-          text: 'Content',
-          align: 'left',
-          value: 'content'
-        }, {
-          text: 'Posted date',
-          align: 'left',
-          value: 'posted_date'
-        }
-      ],
-      news: [],
-      deleted: [],
-      users: [],
-      me: {}
-    }
-  },
-  components: {
-    VContainer,
-    VFlex,
-    VLayout,
-    VDataTable,
-    VBtn,
-    VIcon,
-    VDialog,
-    VTextField,
-    VEditDialog,
-    VSelect,
-    VDatePicker,
-    VMenu,
-    VCard,
-    VSpacer,
-    VCardTitle,
-    markdownEditor
-  },
-  apollo: {
-    news: {
-      query: gql`{ news { id name author { id login group } content cover }}`,
-      update: ({ news }) => news.map(n => Object.assign({ menu: false, dialog: false }, n))
-    },
-    me: {
-      query: gql`{ me { id login group } }`,
-      update: ({ me }) => me
-    },
-    users: {
-      query: gql`{ users { id login group }}`,
-      update: ({ users }) => users.filter(u => u.group !== "VIEWER").map(u => Object.assign({}, u))
-    }
-  },
-  methods: {
-    changeCover({ target: { files: [file] }}, data)
-    {
-      this.save({...data, file});
-    },
-    addNews() {
-      this.news.push({
-        name: 'New News',
-        author: this.me,
-        posted_date: new Date().toISOString().slice(0,10),
-        content: "Empty",
-        menu: false,
-        dialog: false
-      })
-    },
-    removeNews(news) {
-      this.news.splice(this.news.indexOf(news), 1);
-      if (news.id)
-        this.deleted.push(news.id)
-    },
-    saveNews() {
-      this.news.forEach(n => this.save(n));
-      for(const id of this.deleted) {
-        this.$apollo.mutate({
-          mutation:
-            gql`mutation ($id: ID!) {
-                  deleteNews(id: $id)
-                }`,
-          variables: {
-            id
-          }
-        })
-      }
-      this.deleted = []
-    },
-    save(news) {
-      const { id, name, content, author, file } = news;
-      console.log(id ? "UPDATE" : "ADD", id, name, content, author.id);
-      this.$apollo.mutate({
-        mutation: id ? UPDATE_NEWS : ADD_NEWS,
-        variables: {
-          id,
-          news: {
-            name,
-            content,
-            author: author.id,
-            cover: file
-          }
-        }
-      }).then(({data: { id }}) => {
-        news.id = id;
-      })
-    }
-  }
-}
+	data() {
+		return {
+			headers: [
+				{
+					text: "Names",
+					align: "left",
+					value: "name"
+				},
+				{
+					text: "Cover",
+					align: "left",
+					value: "cover"
+				},
+				{
+					text: "Author",
+					align: "left",
+					value: "author"
+				},
+				{
+					text: "Content",
+					align: "left",
+					value: "content"
+				},
+				{
+					text: "Posted date",
+					align: "left",
+					value: "posted_date"
+				}
+			],
+			news: [],
+			deleted: [],
+			users: [],
+			me: {}
+		};
+	},
+	components: {
+		VContainer,
+		VFlex,
+		VLayout,
+		VDataTable,
+		VBtn,
+		VIcon,
+		VDialog,
+		VTextField,
+		VEditDialog,
+		VSelect,
+		VDatePicker,
+		VMenu,
+		VCard,
+		VSpacer,
+		VCardTitle,
+		markdownEditor
+	},
+	apollo: {
+		news: {
+			query: gql`
+				{
+					news {
+						id
+						name
+						author {
+							id
+							login
+							group
+						}
+						content
+						cover
+					}
+				}
+			`,
+			update: ({ news }) =>
+				news.map(n => Object.assign({ menu: false, dialog: false }, n))
+		},
+		me: {
+			query: gql`
+				{
+					me {
+						id
+						login
+						group
+					}
+				}
+			`,
+			update: ({ me }) => me
+		},
+		users: {
+			query: gql`
+				{
+					users {
+						id
+						login
+						group
+					}
+				}
+			`,
+			update: ({ users }) =>
+				users.filter(u => u.group !== "VIEWER").map(u => Object.assign({}, u))
+		}
+	},
+	methods: {
+		changeCover({ target: { files: [file] } }, data) {
+			this.save({ ...data, file });
+		},
+		addNews() {
+			this.news.push({
+				name: "New News",
+				author: this.me,
+				posted_date: new Date().toISOString().slice(0, 10),
+				content: "Empty",
+				menu: false,
+				dialog: false
+			});
+		},
+		removeNews(news) {
+			this.news.splice(this.news.indexOf(news), 1);
+			if (news.id) this.deleted.push(news.id);
+		},
+		saveNews() {
+			this.news.forEach(n => this.save(n));
+			for (const id of this.deleted) {
+				this.$apollo.mutate({
+					mutation: gql`
+						mutation($id: ID!) {
+							deleteNews(id: $id)
+						}
+					`,
+					variables: {
+						id
+					}
+				});
+			}
+			this.deleted = [];
+		},
+		save(news) {
+			const { id, name, content, author, file } = news;
+			console.log(id ? "UPDATE" : "ADD", id, name, content, author.id);
+			this.$apollo
+				.mutate({
+					mutation: id ? UPDATE_NEWS : ADD_NEWS,
+					variables: {
+						id,
+						news: {
+							name,
+							content,
+							author: author.id,
+							cover: file
+						}
+					}
+				})
+				.then(({ data: { id } }) => {
+					news.id = id;
+				});
+		}
+	}
+};
 </script>
 
 <style lang="stylus">

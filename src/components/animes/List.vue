@@ -10,7 +10,7 @@
         hide-actions
         class="elevation-1"
       >
-        <template slot="items" scope="props">
+        <template slot="items" slot-scope="props">
           <td>
             {{ props.item.names.join(', ') }}
           </td>
@@ -38,55 +38,71 @@
 </template>
 
 <script>
-
-import { VDataTable, VBtn, VIcon } from 'vuetify/src/components'
-import { VContainer, VFlex, VLayout } from 'vuetify/src/components/VGrid'
-import gql from 'graphql-tag'
+import { VDataTable, VBtn, VIcon } from "vuetify/es5/components";
+import { VContainer, VFlex, VLayout } from "vuetify/es5/components/VGrid";
+import gql from "graphql-tag";
 
 export default {
-  name: "animes_list",
-  data() {
-      return {
-        headers: [
-          {
-            text: 'Names',
-            align: 'left',
-            value: 'names'
-          }, {
-            text: 'Authors',
-            align: 'left',
-            value: 'authors'
-          }, {
-            text: 'Tags',
-            align: 'left',
-            value: 'tags'
-          }, {
-            text: 'Release Date',
-            align: 'left',
-            value: 'release_date'
-          }, {
-            text: 'Posted date',
-            align: 'left',
-            value: 'posted_date'
-          }
-        ],
-        animes: [],
-        deleted: []
-      }
-  },
-  components: {
-    VContainer,
-    VFlex,
-    VLayout,
-    VDataTable,
-    VBtn,
-    VIcon
-  },
-  apollo: {
-    animes: {
-      query: gql`{ animes(limit: 50) { id names authors { name } tags { name } } }`,
-      update: ({ animes }) => animes
-    }
-  }
-}
+	name: "animes_list",
+	data() {
+		return {
+			headers: [
+				{
+					text: "Names",
+					align: "left",
+					value: "names"
+				},
+				{
+					text: "Authors",
+					align: "left",
+					value: "authors"
+				},
+				{
+					text: "Tags",
+					align: "left",
+					value: "tags"
+				},
+				{
+					text: "Release Date",
+					align: "left",
+					value: "release_date"
+				},
+				{
+					text: "Posted date",
+					align: "left",
+					value: "posted_date"
+				}
+			],
+			animes: [],
+			deleted: []
+		};
+	},
+	components: {
+		VContainer,
+		VFlex,
+		VLayout,
+		VDataTable,
+		VBtn,
+		VIcon
+	},
+	apollo: {
+		animes: {
+			query: gql`
+				{
+					animes(limit: 50) {
+						id
+						names
+						authors {
+							name
+						}
+						tags {
+							name
+						}
+					}
+				}
+			`,
+			update: ({ animes }) => animes
+		}
+	}
+};
 </script>

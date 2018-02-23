@@ -26,7 +26,7 @@
             chips
             autocomplete
           >
-            <template slot="selection" scope="data">
+            <template slot="selection" slot-scope="data">
               <v-chip
                 close
                 @input="data.parent.selectItem(data.item.id)"
@@ -38,7 +38,7 @@
                 {{ data.item.name }}
               </v-chip>
             </template>
-            <template slot="item" scope="data">
+            <template slot="item" slot-scope="data">
               <v-list-tile-avatar>
                 <div :style="{ 'background-color': data.item.color, 'width': '30px', 'height': '30px', 'border-radius': '50%' }"></div>
               </v-list-tile-avatar>
@@ -60,7 +60,7 @@
             chips
             autocomplete
           >
-            <template slot="selection" scope="data">
+            <template slot="selection" slot-scope="data">
               <v-chip
                 close
                 @input="data.parent.selectItem(data.item.id)"
@@ -72,7 +72,7 @@
                 {{ data.item.name }}
               </v-chip>
             </template>
-            <template slot="item" scope="data">
+            <template slot="item" slot-scope="data">
               <v-list-tile-avatar>
                 <div :style="{ 'background-color': data.item.color, 'width': '30px', 'height': '30px', 'border-radius': '50%' }"></div>
               </v-list-tile-avatar>
@@ -110,7 +110,7 @@
               readonly
             ></v-text-field>
             <v-date-picker v-model="date" no-title scrollable actions>
-              <template scope="{ save, cancel }">
+              <template slot-scope="{ save, cancel }">
                 <v-card-actions>
                   <v-btn flat primary @click.native="cancel()">Cancel</v-btn>
                   <v-btn flat primary @click.native="save()">Save</v-btn>
@@ -168,16 +168,16 @@
         hide-actions
         class="elevation-1"
       >
-        <template slot="items" scope="props"></template>
+        <template slot="items" slot-scope="props"></template>
       </v-data-table>
       <v-layout row wrap>
         <v-flex xs2 class="text-xs-left">
-          <v-btn primary @click.stop="">
+          <v-btn primary>
             Add Season
           </v-btn>
         </v-flex>
         <v-flex offset-xs8 xs2 class="text-xs-right">
-          <v-btn primary @click.stop="">
+          <v-btn primary>
             Save
           </v-btn>
         </v-flex>
@@ -189,7 +189,7 @@
         hide-actions
         class="elevation-1"
       >
-        <template slot="items" scope="props"></template>
+        <template slot="items" slot-scope="props"></template>
       </v-data-table>
       <v-layout row wrap>
         <v-flex xs2 class="text-xs-left">
@@ -210,16 +210,16 @@
         hide-actions
         class="elevation-1"
       >
-        <template slot="items" scope="props"></template>
+        <template slot="items" slot-scope="props"></template>
       </v-data-table>
       <v-layout row wrap>
         <v-flex xs2 class="text-xs-left">
-          <v-btn primary @click.stop="">
+          <v-btn primary>
             Add Media
           </v-btn>
         </v-flex>
         <v-flex offset-xs8 xs2 class="text-xs-right">
-          <v-btn primary @click.stop="">
+          <v-btn primary>
             Save
           </v-btn>
         </v-flex>
@@ -229,102 +229,126 @@
 </template>
 
 <script>
-import { VDataTable, VIcon, VBtn, VDialog, VTextField, VSelect, VChip, VAvatar, VDatePicker, VMenu, VDivider } from 'vuetify/src/components'
-import { VList, VListGroup, VListTile, VListTileTitle, VListTileAction, VListTileContent, VListTileAvatar } from 'vuetify/src/components/VList'
-import { VContainer, VFlex, VLayout } from 'vuetify/src/components/VGrid'
+import {
+	VDataTable,
+	VIcon,
+	VBtn,
+	VDialog,
+	VTextField,
+	VSelect,
+	VChip,
+	VAvatar,
+	VDatePicker,
+	VMenu,
+	VDivider
+} from "vuetify/es5/components";
+import {
+	VList,
+	VListGroup,
+	VListTile,
+	VListTileTitle,
+	VListTileAction,
+	VListTileContent,
+	VListTileAvatar
+} from "vuetify/es5/components/VList";
+import { VContainer, VFlex, VLayout } from "vuetify/es5/components/VGrid";
 
 export default {
-  name: "anime_edit",
-  data() {
-    return {
-      names: '',
-      date: null,
-      desc: '',
-      menu: false,
-      authors: [],
-      tags: [],
-      selectedTags: [],
-      selectedAuthors: [],
-      animesStatus: [],
-      selectedStatus: '',
-      seasons: [],
-      episodes: [],
-      medias: [],
-      headers : {
-          seasons: [
-            {
-              text: 'Num',
-              align: 'left',
-              value: 'num'
-            }, {
-              text: 'Date',
-              align: 'left',
-              value: 'date'
-            }, {
-              text: 'Episodes Count',
-              align: 'left',
-              value: 'episodes'
-            }
-          ],
-          episodes: [
-            {
-              text: 'Num',
-              align: 'left',
-              value: 'num'
-            }, {
-              text: 'Season',
-              align: 'left',
-              value: 'season'
-            }, {
-              text: 'Date',
-              align: 'left',
-              value: 'date'
-            }
-          ],
-          medias: [
-            {
-              text: 'Name',
-              align: 'left',
-              value: 'name'
-            },
-            {
-              text: 'Type',
-              align: 'left',
-              value: 'type'
-            },
-            {
-              text: 'Date',
-              align: 'left',
-              value: 'date'
-            }
-          ]
-      }
-    }
-  },
-  components: {
-    VContainer,
-    VFlex,
-    VLayout,
-    VDataTable,
-    VIcon,
-    VBtn,
-    VDialog,
-    VTextField,
-    VSelect,
-    VChip,
-    VList,
-    VListGroup,
-    VListTile,
-    VListTileTitle,
-    VListTileAction,
-    VListTileContent,
-    VListTileAvatar,
-    VAvatar,
-    VMenu,
-    VDatePicker,
-    VDivider,
-  }
-}
+	name: "anime_edit",
+	data() {
+		return {
+			names: "",
+			date: null,
+			desc: "",
+			menu: false,
+			authors: [],
+			tags: [],
+			selectedTags: [],
+			selectedAuthors: [],
+			animesStatus: [],
+			selectedStatus: "",
+			seasons: [],
+			episodes: [],
+			medias: [],
+			headers: {
+				seasons: [
+					{
+						text: "Num",
+						align: "left",
+						value: "num"
+					},
+					{
+						text: "Date",
+						align: "left",
+						value: "date"
+					},
+					{
+						text: "Episodes Count",
+						align: "left",
+						value: "episodes"
+					}
+				],
+				episodes: [
+					{
+						text: "Num",
+						align: "left",
+						value: "num"
+					},
+					{
+						text: "Season",
+						align: "left",
+						value: "season"
+					},
+					{
+						text: "Date",
+						align: "left",
+						value: "date"
+					}
+				],
+				medias: [
+					{
+						text: "Name",
+						align: "left",
+						value: "name"
+					},
+					{
+						text: "Type",
+						align: "left",
+						value: "type"
+					},
+					{
+						text: "Date",
+						align: "left",
+						value: "date"
+					}
+				]
+			}
+		};
+	},
+	components: {
+		VContainer,
+		VFlex,
+		VLayout,
+		VDataTable,
+		VIcon,
+		VBtn,
+		VDialog,
+		VTextField,
+		VSelect,
+		VChip,
+		VList,
+		VListGroup,
+		VListTile,
+		VListTileTitle,
+		VListTileAction,
+		VListTileContent,
+		VListTileAvatar,
+		VAvatar,
+		VMenu,
+		VDatePicker,
+		VDivider
+	}
+};
 </script>
 
 <style lang="stylus">
