@@ -1,8 +1,5 @@
 <template>
   <v-container>
-    <div class="text-xs-center">
-      <h2 class="headline">Authors</h2>
-    </div>
     <v-data-table
       :headers="headers"
       :items="authors"

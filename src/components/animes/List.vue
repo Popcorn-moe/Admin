@@ -1,9 +1,6 @@
 <template>
   <div class="animes-list">
     <v-container>
-      <div class="text-xs-center">
-        <h2 class="headline">Animes List</h2>
-      </div>
       <v-data-table
         :headers="headers"
         :items="animes"

@@ -1,8 +1,5 @@
 <template>
   <v-container>
-    <div class="text-xs-center">
-      <h2 class="headline">Users</h2>
-    </div>
     <v-data-table
       :headers="headers"
       :items="users"
@@ -57,7 +54,8 @@ import {
 	VIcon,
 	VBtn,
 	VTextField,
-	VSelect
+	VSelect,
+	VMenu
 } from "vuetify/es5/components";
 import VEditDialog from "vuetify/es5/components/VDataTable/VEditDialog";
 import { VContainer, VFlex, VLayout } from "vuetify/es5/components/VGrid";

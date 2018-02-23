@@ -9,12 +9,7 @@
     >
       <div class="nav-content">
         <v-layout row wrap class="no-margin text-xs-center">
-          <v-flex xs3>
-            <v-btn icon @click.stop="$emit('input', !value)">
-              <v-icon>menu</v-icon>
-            </v-btn>
-          </v-flex>
-          <v-flex xs6>
+          <v-flex xs6 offset-xs3>
             <object data="/static/logo-animated.svg" type="image/svg+xml"></object>
           </v-flex>
         </v-layout>

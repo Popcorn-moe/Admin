@@ -1,9 +1,6 @@
 <template>
   <div class="anime-edit">
     <v-container>
-      <div class="text-xs-center">
-        <h2 class="headline">Edit Anime</h2>
-      </div>
       <v-layout>
         <v-flex xs6 offset-xs3>
           <v-text-field

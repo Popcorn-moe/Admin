@@ -78,6 +78,8 @@ function convert(routes) {
 		if (v.submenus) {
 			v.submenus.forEach(s => {
 				s.path = v.path + s.path;
+				s.meta = {};
+				s.meta.totalname = v.name + " > " + s.name;
 				newRoutes.push(s);
 			});
 		} else newRoutes.push(v);

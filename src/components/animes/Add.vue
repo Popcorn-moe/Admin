@@ -1,8 +1,5 @@
 <template>
   <v-container>
-    <div class="text-xs-center">
-      <h2 class="headline">Add Anime</h2>
-    </div>
     <v-layout>
       <v-flex xs6 offset-xs3>
         <v-text-field
