@@ -54,7 +54,7 @@
                                     </v-card-title>
                                     <v-card-actions>
                                         <v-spacer></v-spacer>
-                                        <v-btn flat outline color="primary" :to="item.page">Go</v-btn>
+                                        <v-btn flat outline color="primary" :to="{ name: item.page }">Go</v-btn>
                                     </v-card-actions>
                                 </v-card>
                             </v-flex>
