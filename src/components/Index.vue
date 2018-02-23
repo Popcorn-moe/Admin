@@ -10,7 +10,7 @@
     >
       <v-toolbar-title class="mx-auto" slot="extension">
           <span>Welcome to Popcorn.moe Admin</span>
-          <h2 class="white--text">All abuses start from here</h2>
+          <h2 class="white--text">All abuses starts from here</h2>
           <v-layout row>
               <v-flex wrap>
                 <v-btn outline large fab color="white" class="outine-2" :to="{ name: 'Users' }">
@@ -94,7 +94,7 @@ export default {
 				{
 					title: "Users",
 					page: "Users",
-					description: "Manager Users and use fun tools like the Ban Hammer",
+					description: "Manage Users and use fun tools like the Ban Hammer",
 					color: "orange"
 				},
 				{
@@ -114,7 +114,7 @@ export default {
 				{
 					title: "Tags",
 					page: "Tags",
-					description: "Add tags to warn about users about shitty animes",
+					description: "Add colored tags to warn users about shitty animes",
 					color: "purple"
 				},
 				{
