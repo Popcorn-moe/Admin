@@ -2,10 +2,10 @@
 	<div>
 		<v-snackbar
 			class="snackbar"
-			:timeout="60000"
+			:timeout="6000"
 			top
 			:value="error"
-			@input="setError"
+			@input="setErrorValue"
 		>
 			<v-alert
 				dismissible
@@ -21,7 +21,12 @@
 				</v-btn>
 			</v-alert>
 		</v-snackbar>
-		<v-dialog v-if="seeError = true">
+		<v-dialog v-model="seeError" max-width="500" scrollable>
+			<v-card>
+				<v-card-text>
+					<pre>{{ error }}</pre>
+				</v-card-text>
+			</v-card>
 		</v-dialog>
 	</div>
 </template>
@@ -32,8 +37,10 @@ import {
 	VAlert,
 	VBtn,
 	VIcon,
-	VDialog
+	VDialog,
+	VCard
 } from "vuetify/es5/components";
+import { VCardText } from "vuetify/es5/components/VCard";
 import { mapGetters, mapActions } from "vuex";
 
 export default {
@@ -47,16 +54,28 @@ export default {
 		VAlert,
 		VBtn,
 		VIcon,
-		VDialog
+		VDialog,
+		VCard,
+		VCardText
 	},
 	computed: mapGetters({
 		drawer: "drawer",
 		error: "error"
 	}),
-	methods: mapActions({
-		toggleDrawer: "toggleDrawer",
-		setError: "setError"
-	})
+	methods: {
+		...mapActions({
+			toggleDrawer: "toggleDrawer",
+			setError: "setError"
+		}),
+		setErrorValue(val) {
+			if (val === false && !this.seeError) this.setError(false);
+		}
+	},
+	watch: {
+		seeError(value) {
+			if (value === false) this.setError(false);
+		}
+	}
 };
 </script>
 

@@ -176,6 +176,7 @@ import { mavonEditor as MavonEditor } from "mavon-editor";
 import KitsuSearch from "./KitsuSearch.vue";
 import Preview from "./Preview.vue";
 import gql from "graphql-tag";
+import { mapActions } from "vuex";
 
 export default {
 	data() {
@@ -196,6 +197,9 @@ export default {
 		};
 	},
 	methods: {
+		...mapActions({
+			setError: "setError"
+		}),
 		selectKitsu(item) {
 			this.load = true;
 			item
@@ -264,7 +268,7 @@ export default {
 				})
 				.catch(err => {
 					this.load = false;
-					console.error(err);
+					this.setError(err);
 				});
 		}
 	},
