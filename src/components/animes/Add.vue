@@ -4,11 +4,11 @@
     <div class="overlay overlay--active" v-if="load"></div>
     <v-stepper v-model="el">
       <v-stepper-header>
-        <v-stepper-step step="1" :complete="el > 1">Names, Description, Status</v-stepper-step>
+        <v-stepper-step step="1" :complete="el > 1" editable>Names, Description, Status</v-stepper-step>
         <v-divider></v-divider>
-        <v-stepper-step step="2" :complete="el > 2">Cover and Banner</v-stepper-step>
+        <v-stepper-step step="2" :complete="el > 2" editable>Cover and Poster</v-stepper-step>
         <v-divider></v-divider>
-        <v-stepper-step step="3">Tags and Authors</v-stepper-step>
+        <v-stepper-step step="3" editable>Tags and Authors</v-stepper-step>
       </v-stepper-header>
       <v-stepper-items>
         <v-stepper-content step="1">
@@ -58,9 +58,21 @@
           <v-btn flat>Cancel</v-btn>
         </v-stepper-content>
         <v-stepper-content step="2">
-          <preview :value="poster" alt="poster"></preview>
-          <preview :value="cover" alt="cover"></preview>
-          <v-btn color="primary" @click.native="el = 1">Return</v-btn>
+          <div class="anime-background">
+            <preview :value="cover" alt="cover" width="100%"></preview>
+          </div>
+          <div class="anime-poster">
+            <preview :value="poster" alt="poster"></preview>
+            <h3 class="uppercase">{{ names && names[0] }}</h3>
+          </div>
+          <v-layout row wrap>
+            <v-flex offset-md1 md2>
+              <v-subheader>Upload Poster</v-subheader>
+            </v-flex>
+            <v-flex offset-md6 md2>
+              <v-subheader>Upload Cover</v-subheader>
+            </v-flex>
+          </v-layout>
           <v-btn color="primary" @click.native="el = 3">Continue</v-btn>
           <v-btn flat>Cancel</v-btn>
         </v-stepper-content>
@@ -135,7 +147,6 @@
               </v-select>
             </v-flex>
           </v-layout>
-          <v-btn color="primary" @click.native="el = 2">Return</v-btn>
           <v-btn color="primary" @click.native="addAnime">Finish</v-btn>
           <v-btn flat>Cancel</v-btn>
         </v-stepper-content>
@@ -154,7 +165,8 @@ import {
 	VProgressCircular,
 	VTextField,
 	VDialog,
-	VCard
+	VCard,
+	VIcon
 } from "vuetify/es5/components";
 import {
 	VListTileContent,
@@ -187,35 +199,41 @@ export default {
 	},
 	methods: {
 		selectKitsu(item) {
-			this.names = Object.values(item.titles);
-			this.desc = item.synopsis;
-			// TODO use trailer item.youtubeVideoId
-			switch (item.status) {
-				case "finished":
-					this.selectedStatus = "Finished";
-					break;
-				case "current":
-					this.selectedStatus = "Pending";
-					break;
-				default:
-					this.selectedStatus = "Not Started";
-					break;
-			}
-			this.date = item.startDate;
 			this.load = true;
-			Promise.all([
-				item.coverImage &&
-					fetch(
-						`https://cors-anywhere.herokuapp.com/${item.coverImage.original}`
-					)
-						.then(res => res.blob())
-						.then(blob => (this.cover = blob)),
-				fetch(
-					`https://cors-anywhere.herokuapp.com/${item.posterImage.original}`
-				)
-					.then(res => res.blob())
-					.then(blob => (this.poster = blob))
-			]).then(_ => (this.load = false));
+			item
+				.then(item => {
+					this.names = Object.values(item.titles);
+					this.desc = item.synopsis;
+					// TODO use trailer item.youtubeVideoId
+					switch (item.status) {
+						case "finished":
+							this.selectedStatus = "Finished";
+							break;
+						case "current":
+							this.selectedStatus = "Pending";
+							break;
+						default:
+							this.selectedStatus = "Not Started";
+							break;
+					}
+					this.date = item.startDate;
+					return Promise.all([
+						item.coverImage &&
+							fetch(
+								`https://cors-anywhere.herokuapp.com/${
+									item.coverImage.original
+								}`
+							)
+								.then(res => res.blob())
+								.then(blob => (this.cover = blob)),
+						fetch(
+							`https://cors-anywhere.herokuapp.com/${item.posterImage.original}`
+						)
+							.then(res => res.blob())
+							.then(blob => (this.poster = blob))
+					]);
+				})
+				.then(_ => (this.load = false));
 		},
 		removeName(name) {
 			this.names.splice(this.names.indexOf(name), 1);
@@ -236,8 +254,8 @@ export default {
 							tags: this.selectedTags,
 							status: this.selectedStatus.toUpperCase().replace(" ", "_"),
 							desc: this.desc,
-							cover: this.cover,
-							background: this.poster,
+							cover: this.poster,
+							background: this.cover,
 							release_date: this.date + "T00:00:00Z" //UTC date (midnight greenwich)
 						}
 					}
@@ -267,7 +285,8 @@ export default {
 		KitsuSearch,
 		VDialog,
 		VCard,
-		Preview
+		Preview,
+		VIcon
 	},
 	apollo: {
 		animesStatus: {
@@ -347,6 +366,29 @@ export default {
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
+    }
+
+    .anime-background {
+      overflow-y: hidden;
+      height: 405px;
+    }
+
+    .anime-poster {
+      padding-top: 30px;
+
+      img {
+        box-shadow: 0px 2px 12px 0px rgba(16,16,17,0.5);
+        margin-right: 18px;
+        margin-top: -105px;
+        margin-left: 8.333333333333332%;
+        width: 180px;
+        height: 250px;
+      }
+
+      h3 {
+        display: inline;
+        vertical-align: top;
+      }
     }
   }
 </style>

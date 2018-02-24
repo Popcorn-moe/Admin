@@ -62,9 +62,12 @@ export default {
 		},
 		select(item) {
 			this.promise.then(() => (this.search = null));
-			fetch(`https://kitsu.io/api/edge/anime/${item.id}`)
-				.then(res => res.json())
-				.then(({ data: { attributes } }) => this.$emit("input", attributes));
+			this.$emit(
+				"input",
+				fetch(`https://kitsu.io/api/edge/anime/${item.id}`)
+					.then(res => res.json())
+					.then(({ data: { attributes } }) => attributes)
+			);
 		}
 	},
 	components: {
