@@ -1,9 +1,11 @@
 export const TOGGLE_DRAWER = "TOGGLE_DRAWER";
 export const SET_DARK_THEME = "DARK_THEME";
+export const SET_ERROR = "ERROR";
 
 const state = {
 	darkTheme: localStorage.getItem("darkTheme") === "true",
-	drawer: localStorage.getItem("drawer") === "true"
+	drawer: localStorage.getItem("drawer") === "true",
+	error: false
 };
 
 export function onLoad(store) {
@@ -29,6 +31,9 @@ const mutations = {
 	},
 	[TOGGLE_DRAWER](state, drawer) {
 		state.drawer = drawer;
+	},
+	[SET_ERROR](state, error) {
+		state.error = error;
 	}
 };
 
@@ -40,12 +45,16 @@ const actions = {
 	toggleDrawer({ commit }, drawer) {
 		commit(TOGGLE_DRAWER, drawer);
 		localStorage.setItem("drawer", drawer);
+	},
+	setError({ commit }, error) {
+		commit(SET_ERROR, error);
 	}
 };
 
 const getters = {
 	darkTheme: ({ darkTheme }) => darkTheme,
-	drawer: ({ drawer }) => drawer
+	drawer: ({ drawer }) => drawer,
+	error: ({ error }) => error
 };
 
 export default {
