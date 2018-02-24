@@ -48,8 +48,9 @@ export const routes = [
 			{
 				hide: true,
 				icon: "edit",
-				path: "/edit",
+				path: "/edit/:id",
 				name: "Edit",
+				props: true,
 				component: EditAnime
 			}
 		]
@@ -82,7 +83,7 @@ function convert(routes) {
 				s.path = v.path + s.path;
 				s.meta = {};
 				s.meta.parent = v.name;
-				s.meta.submenus = v.submenus.map(s => s.name);
+				s.meta.submenus = v.submenus.filter(s => !s.hide).map(s => s.name);
 				newRoutes.push(s);
 			});
 		} else newRoutes.push(v);

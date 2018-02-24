@@ -23,11 +23,14 @@
           <td>
             {{ props.item.posted_date }}
           </td>
-          <td align="right">
-            <v-btn icon @click.stop="() => removeAnime(props.item)">
-              <v-icon>close</v-icon>
-            </v-btn>
-          </td>
+					<td class="justify-center layout px-0">
+						<v-btn icon class="mx-0" :to="{ name: 'Edit', params: { id: props.item.id }}">
+							<v-icon>edit</v-icon>
+						</v-btn>
+						<v-btn icon class="mx-0" @click="removeAnime(props.item)">
+							<v-icon>close</v-icon>
+						</v-btn>
+					</td>
         </template>
       </v-data-table>
     </v-container>

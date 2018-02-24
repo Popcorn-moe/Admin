@@ -10,9 +10,19 @@ export default {
 			source: null
 		};
 	},
+	created() {
+		this.value && this.setSource(this.value);
+	},
 	watch: {
 		value(val) {
-			if (val) {
+			val && this.setSource(val);
+		}
+	},
+	methods: {
+		setSource(val) {
+			console.log(typeof val);
+			if (typeof val === "string") this.source = val;
+			else {
 				const reader = new FileReader();
 				reader.addEventListener("load", ({ target: { result } }) => {
 					this.source = result;

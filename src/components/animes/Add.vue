@@ -264,7 +264,11 @@ export default {
 				.then(_ => {
 					this.load = false;
 					this.$router.push({ name: "List" });
-				}, _ => (this.load = false));
+				})
+				.catch(err => {
+					this.load = false;
+					console.error(err);
+				});
 		}
 	},
 	components: {

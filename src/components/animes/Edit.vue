@@ -1,357 +1,104 @@
 <template>
-  <div class="anime-edit">
-    <v-container>
-      <v-layout>
-        <v-flex xs6 offset-xs3>
-          <v-text-field
-            label="Names"
-            v-model="names"
-            required
-          ></v-text-field>
-        </v-flex>
-      </v-layout>
-      <v-layout>
-        <v-flex xs6>
-          <v-select
-            label="Select Tags"
-            :items="tags"
-            v-model="selectedTags"
-            item-text="name"
-            item-value="id"
-            class="tags-select"
-            multiple
-            chips
-            autocomplete
-          >
-            <template slot="selection" slot-scope="data">
-              <v-chip
-                close
-                @input="data.parent.selectItem(data.item.id)"
-                @click.native.stop
-                class="chip--select-multi"
-                :key="data.item.id"
-              >
-                <v-list-tile-avatar :style="{ 'background-color': data.item.color }"></v-list-tile-avatar>
-                {{ data.item.name }}
-              </v-chip>
-            </template>
-            <template slot="item" slot-scope="data">
-              <v-list-tile-avatar>
-                <div :style="{ 'background-color': data.item.color, 'width': '30px', 'height': '30px', 'border-radius': '50%' }"></div>
-              </v-list-tile-avatar>
-              <v-list-tile-content>
-                <v-list-tile-title v-html="data.item.name"></v-list-tile-title>
-              </v-list-tile-content>
-            </template>
-          </v-select>
-        </v-flex>
-        <v-flex xs6>
-          <v-select
-            label="Select Authors"
-            :items="authors"
-            v-model="selectedAuthors"
-            item-text="name"
-            item-value="id"
-            class="tags-select"
-            multiple
-            chips
-            autocomplete
-          >
-            <template slot="selection" slot-scope="data">
-              <v-chip
-                close
-                @input="data.parent.selectItem(data.item.id)"
-                @click.native.stop
-                class="chip--select-multi"
-                :key="data.item.id"
-              >
-                <v-list-tile-avatar :style="{ 'background-color': data.item.color }"></v-list-tile-avatar>
-                {{ data.item.name }}
-              </v-chip>
-            </template>
-            <template slot="item" slot-scope="data">
-              <v-list-tile-avatar>
-                <div :style="{ 'background-color': data.item.color, 'width': '30px', 'height': '30px', 'border-radius': '50%' }"></div>
-              </v-list-tile-avatar>
-              <v-list-tile-content>
-                <v-list-tile-title v-html="data.item.name"></v-list-tile-title>
-              </v-list-tile-content>
-            </template>
-          </v-select>
-        </v-flex>
-      </v-layout>
-      <v-layout>
-        <v-flex xs6>
-          <v-select
-            :items="animesStatus"
-            v-model="selectedStatus"
-            label="Status"
-          ></v-select>
-        </v-flex>
-        <v-flex xs6>
-          <v-menu
-            lazy
-            :close-on-content-click="false"
-            v-model="menu"
-            transition="scale-transition"
-            offset-y
-            full-width
-            :nudge-left="40"
-            max-width="290px"
-          >
-            <v-text-field
-              slot="activator"
-              label="Release Date"
-              v-model="date"
-              prepend-icon="event"
-              readonly
-            ></v-text-field>
-            <v-date-picker v-model="date" no-title scrollable actions>
-              <template slot-scope="{ save, cancel }">
-                <v-card-actions>
-                  <v-btn flat primary @click.native="cancel()">Cancel</v-btn>
-                  <v-btn flat primary @click.native="save()">Save</v-btn>
-                </v-card-actions>
-              </template>
-            </v-date-picker>
-          </v-menu>
-        </v-flex>
-      </v-layout>
-      <v-layout>
-        <v-flex xs5>
-          <v-text-field
-            label="Cover Link"
-            required
-          ></v-text-field>
-        </v-flex>
-        <v-flex xs1>
-          <v-btn icon large primary dark @click.stop="">
-            <v-icon>file_upload</v-icon>
-          </v-btn>
-        </v-flex>
-        <v-flex xs5>
-          <v-text-field
-            label="Banner Link"
-            required
-          ></v-text-field>
-        </v-flex>
-        <v-flex xs1>
-          <v-btn icon large primary dark @click.stop="">
-            <v-icon>file_upload</v-icon>
-          </v-btn>
-        </v-flex>
-      </v-layout>
-      <v-layout>
-        <v-flex>
-          <v-text-field
-            label="Desc"
-            v-model="desc"
-            multi-line
-          ></v-text-field>
-        </v-flex>
-      </v-layout>
-      <v-layout>
-        <v-flex offset-xs10 xs2 class="text-xs-right">
-          <v-btn primary @click.stop="addAnime()">
-            Add
-          </v-btn>
-        </v-flex>
-      </v-layout>
-      <v-divider></v-divider>
-      <h6>Seasons : </h6>
-      <v-data-table
-        :headers="headers.seasons"
-        :items="seasons"
-        hide-actions
-        class="elevation-1"
-      >
-        <template slot="items" slot-scope="props"></template>
-      </v-data-table>
-      <v-layout row wrap>
-        <v-flex xs2 class="text-xs-left">
-          <v-btn primary>
-            Add Season
-          </v-btn>
-        </v-flex>
-        <v-flex offset-xs8 xs2 class="text-xs-right">
-          <v-btn primary>
-            Save
-          </v-btn>
-        </v-flex>
-      </v-layout>
-      <h6>Episodes : </h6>
-      <v-data-table
-        :headers="headers.episodes"
-        :items="episodes"
-        hide-actions
-        class="elevation-1"
-      >
-        <template slot="items" slot-scope="props"></template>
-      </v-data-table>
-      <v-layout row wrap>
-        <v-flex xs2 class="text-xs-left">
-          <v-btn primary @click.stop="">
-            Add Episode
-          </v-btn>
-        </v-flex>
-        <v-flex offset-xs8 xs2 class="text-xs-right">
-          <v-btn primary @click.stop="">
-            Save
-          </v-btn>
-        </v-flex>
-      </v-layout>
-      <h6>Medias : </h6>
-      <v-data-table
-        :headers="headers.medias"
-        :items="medias"
-        hide-actions
-        class="elevation-1"
-      >
-        <template slot="items" slot-scope="props"></template>
-      </v-data-table>
-      <v-layout row wrap>
-        <v-flex xs2 class="text-xs-left">
-          <v-btn primary>
-            Add Media
-          </v-btn>
-        </v-flex>
-        <v-flex offset-xs8 xs2 class="text-xs-right">
-          <v-btn primary>
-            Save
-          </v-btn>
-        </v-flex>
-      </v-layout>
-    </v-container>
+  <div v-if="anime" class="edit-page">
+	<div class="anime-background">
+		<preview :value="anime.background" alt="cover" width="100%"></preview>
+	</div>
+	<div class="anime-poster">
+	<preview :value="anime.cover" alt="poster"></preview>
+		<h3 class="uppercase">{{ anime.names && anime.names[0] }}</h3>
+	</div>
   </div>
 </template>
 
 <script>
-import {
-	VDataTable,
-	VIcon,
-	VBtn,
-	VDialog,
-	VTextField,
-	VSelect,
-	VChip,
-	VAvatar,
-	VDatePicker,
-	VMenu,
-	VDivider
-} from "vuetify/es5/components";
-import {
-	VList,
-	VListGroup,
-	VListTile,
-	VListTileTitle,
-	VListTileAction,
-	VListTileContent,
-	VListTileAvatar
-} from "vuetify/es5/components/VList";
-import { VContainer, VFlex, VLayout } from "vuetify/es5/components/VGrid";
+import gql from "graphql-tag";
+import { client } from "../../graphql";
+import Preview from "./Preview";
 
 export default {
-	name: "anime_edit",
+	props: ["id"],
 	data() {
+		// Try from cache
+		try {
+			const anime = client.readFragment({
+				id: this.id,
+				fragment: gql`
+					fragment anime on Anime {
+						names
+						cover
+						background
+						authors {
+							id
+							name
+						}
+					}
+				`
+			});
+			if (anime) return { anime, loading: false };
+		} catch (e) {
+			console.log(e);
+		}
+		// Query it
+		client
+			.query({
+				query: gql`
+					query($id: ID!) {
+						anime(id: $id) {
+							id
+							names
+							cover
+							background
+							authors {
+								id
+								name
+							}
+						}
+					}
+				`,
+				variables: {
+					id: this.id
+				}
+			})
+			.then(({ data: { anime } }) => {
+				if (anime) {
+					this.anime = anime;
+				} else this.$router.replace({ name: "404" });
+			});
 		return {
-			names: "",
-			date: null,
-			desc: "",
-			menu: false,
-			authors: [],
-			tags: [],
-			selectedTags: [],
-			selectedAuthors: [],
-			animesStatus: [],
-			selectedStatus: "",
-			seasons: [],
-			episodes: [],
-			medias: [],
-			headers: {
-				seasons: [
-					{
-						text: "Num",
-						align: "left",
-						value: "num"
-					},
-					{
-						text: "Date",
-						align: "left",
-						value: "date"
-					},
-					{
-						text: "Episodes Count",
-						align: "left",
-						value: "episodes"
-					}
-				],
-				episodes: [
-					{
-						text: "Num",
-						align: "left",
-						value: "num"
-					},
-					{
-						text: "Season",
-						align: "left",
-						value: "season"
-					},
-					{
-						text: "Date",
-						align: "left",
-						value: "date"
-					}
-				],
-				medias: [
-					{
-						text: "Name",
-						align: "left",
-						value: "name"
-					},
-					{
-						text: "Type",
-						align: "left",
-						value: "type"
-					},
-					{
-						text: "Date",
-						align: "left",
-						value: "date"
-					}
-				]
-			}
+			anime: null
 		};
 	},
 	components: {
-		VContainer,
-		VFlex,
-		VLayout,
-		VDataTable,
-		VIcon,
-		VBtn,
-		VDialog,
-		VTextField,
-		VSelect,
-		VChip,
-		VList,
-		VListGroup,
-		VListTile,
-		VListTileTitle,
-		VListTileAction,
-		VListTileContent,
-		VListTileAvatar,
-		VAvatar,
-		VMenu,
-		VDatePicker,
-		VDivider
+		Preview
 	}
 };
 </script>
 
 <style lang="stylus">
-  @import "../../stylus/main.styl";
-  .flex {
-    padding: 5px;
-  }
+  	@import '../../stylus/main.styl';
 
+	.edit-page {
+		.anime-background {
+			overflow-y: hidden;
+			height: 405px;
+		}
+
+		.anime-poster {
+			padding-top: 30px;
+
+			img {
+				box-shadow: 0px 2px 12px 0px rgba(16,16,17,0.5);
+				margin-right: 18px;
+				margin-top: -105px;
+				margin-left: 8.333333333333332%;
+				width: 180px;
+				height: 250px;
+			}
+
+			h3 {
+				display: inline;
+				vertical-align: top;
+			}
+		}	
+	}
 </style>
