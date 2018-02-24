@@ -1,16 +1,26 @@
 import Vue from "vue";
 import { ApolloClient } from "apollo-client";
-import { createNetworkInterface } from "./network-interface.js";
+import { createUploadLink } from "apollo-upload-client";
+import { InMemoryCache } from "apollo-cache-inmemory";
 import VueApollo from "vue-apollo";
 
 Vue.use(VueApollo);
 
-const apolloClient = new ApolloClient({
-	networkInterface: createNetworkInterface({
-		uri: `${process.env.API_URL}/graphql`
-	})
+const cache = new InMemoryCache({
+	addTypename: true,
+	dataIdFromObject: ({ id }) => id
+});
+
+const link = createUploadLink({
+	uri: `${process.env.API_URL}/graphql`,
+	credentials: "include"
+});
+
+export const client = new ApolloClient({
+	link,
+	cache
 });
 
 export default new VueApollo({
-	defaultClient: apolloClient
+	defaultClient: client
 });

@@ -28,6 +28,6 @@ new Vue({
 	el: "#app",
 	router,
 	store,
-	apolloProvider,
+	provide: apolloProvider.provide(),
 	render: h => h(App)
 });

@@ -194,7 +194,8 @@ export default {
 			selectedStatus: "Finished",
 			date: null,
 			cover: null,
-			poster: null
+			poster: null,
+			animesStatus: []
 		};
 	},
 	methods: {
