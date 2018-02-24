@@ -1,7 +1,7 @@
 <template>
-  	<label class="upload">
+	<label class="upload">
 		<slot></slot>
-        <input type="file" @change="setFiles">
+		<input type="file" @change="setFiles">
 	</label>
 </template>
 

@@ -54,21 +54,25 @@
               <mavon-editor language="en" v-model="desc"></mavon-editor>
             </v-flex>
           </v-layout>
-          <v-btn color="primary" @click.native="el = 2">Continue</v-btn>
+          <v-layout row wrap>
+            <v-flex offset-md11>
+              <v-btn color="primary" @click.native="el = 2">Continue</v-btn>
+            </v-flex>
+          </v-layout>
         </v-stepper-content>
         <v-stepper-content step="2">
-          <upload class="anime-background" @input="([file]) => cover = file">
-            <v-icon class="upload-icon">file_upload</v-icon>
-            <preview :value="cover" alt="cover" width="100%"></preview>
-          </upload>
-          <div class="anime-poster">
-            <upload class="anime-poster-img" @input="([file]) => poster = file">
-              <v-icon class="upload-icon">file_upload</v-icon>
-              <preview :value="poster" alt="poster"></preview>
-            </upload>
-            <h3 class="uppercase">{{ names && names[0] }}</h3>
-          </div>
-          <v-btn color="primary" @click.native="el = 3">Continue</v-btn>
+          <anime-head
+            :names="names"
+            :cover="cover"
+            :poster="poster"
+            @setCover="file => cover = file"
+            @setPoster="file => poster = file"
+          ></anime-head>
+          <v-layout row wrap>
+            <v-flex offset-md11>
+              <v-btn color="primary" @click.native="el = 3">Continue</v-btn>
+            </v-flex>
+          </v-layout>
         </v-stepper-content>
         <v-stepper-content step="3">
           <v-layout>
@@ -141,7 +145,11 @@
               </v-select>
             </v-flex>
           </v-layout>
-          <v-btn color="primary" @click.native="addAnime">Finish</v-btn>
+          <v-layout row wrap>
+            <v-flex offset-md11>
+              <v-btn color="primary" @click.native="addAnime">Finish</v-btn>
+            </v-flex>
+          </v-layout>
         </v-stepper-content>
       </v-stepper-items>
     </v-stepper>
@@ -170,8 +178,7 @@ import { VContainer, VFlex, VLayout } from "vuetify/es5/components/VGrid";
 import * as VStepper from "vuetify/es5/components/VStepper";
 import { mavonEditor as MavonEditor } from "mavon-editor";
 import KitsuSearch from "./KitsuSearch";
-import Preview from "./Preview";
-import Upload from "./Upload";
+import AnimeHead from "./AnimeHead";
 import gql from "graphql-tag";
 import { mapActions } from "vuex";
 
@@ -288,9 +295,7 @@ export default {
 		KitsuSearch,
 		VDialog,
 		VCard,
-		Preview,
-		VIcon,
-		Upload
+		AnimeHead
 	},
 	apollo: {
 		animesStatus: {
@@ -370,73 +375,6 @@ export default {
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-    }
-
-    .anime-background, .anime-poster-img {
-      position: relative;
-
-      .upload-icon {
-        width: 100%;
-        height: 100%;
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        z-index: 1;
-        font-size: 58px;
-        background: black;
-        opacity: 0;
-
-        &:hover {
-          opacity: 0.8;
-        }
-      }
-    }
-
-    .anime-background {
-      overflow-y: hidden;
-      height: 405px;
-
-      img {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-      }
-
-      .upload-icon {
-        height: 406px;
-      }
-    }
-
-    .anime-poster {
-      padding-top: 30px;
-
-      .anime-poster-img {
-        display: inline-block;
-        z-index: 2;
-        box-shadow: 0px 2px 12px 0px rgba(16,16,17,0.5);
-        margin-right: 18px;
-        margin-top: -105px;
-        margin-left: 8.333333333333332%;
-        width: 180px;
-        height: 250px;
-
-        img {
-          position: absolute;
-          width: 100%;
-          height: 100%;
-        }
-
-        .upload-icon {
-          z-index: 2;
-        }
-      }
-
-      h3 {
-        display: inline;
-        vertical-align: top;
-      }
     }
   }
 </style>
