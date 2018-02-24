@@ -55,7 +55,6 @@
             </v-flex>
           </v-layout>
           <v-btn color="primary" @click.native="el = 2">Continue</v-btn>
-          <v-btn flat>Cancel</v-btn>
         </v-stepper-content>
         <v-stepper-content step="2">
           <div class="anime-background">
@@ -74,7 +73,6 @@
             </v-flex>
           </v-layout>
           <v-btn color="primary" @click.native="el = 3">Continue</v-btn>
-          <v-btn flat>Cancel</v-btn>
         </v-stepper-content>
         <v-stepper-content step="3">
           <v-layout>
@@ -148,7 +146,6 @@
             </v-flex>
           </v-layout>
           <v-btn color="primary" @click.native="addAnime">Finish</v-btn>
-          <v-btn flat>Cancel</v-btn>
         </v-stepper-content>
       </v-stepper-items>
     </v-stepper>
