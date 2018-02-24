@@ -1,7 +1,7 @@
 <template>
   <v-app :light="!darkTheme" :dark="darkTheme">
     <layout v-if="me && me.group === 'ADMIN'"></layout>
-    <div v-else class="unauthorized">
+    <div v-else-if="me === null" class="unauthorized">
       Unauthorized
       {{ me }}
     </div>
