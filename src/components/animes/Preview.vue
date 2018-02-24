@@ -20,7 +20,6 @@ export default {
 	},
 	methods: {
 		setSource(val) {
-			console.log(typeof val);
 			if (typeof val === "string") this.source = val;
 			else {
 				const reader = new FileReader();
