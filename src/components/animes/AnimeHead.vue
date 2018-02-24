@@ -92,6 +92,7 @@ export default {
 				height: 250px;
 
 				img {
+					height: 100%;
 					position: absolute;
 				}
 
