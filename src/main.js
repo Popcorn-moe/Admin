@@ -9,6 +9,7 @@ import colors from "vuetify/es5/util/colors";
 
 VEditDialog.components = VEditDialog.components || {};
 VEditDialog.components.VMenu = VMenu;
+VEditDialog.components.VMenu = VMenu;
 
 Vue.config.productionTip = false;
 Vue.use(Vuetify, {

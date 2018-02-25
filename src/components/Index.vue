@@ -123,6 +123,13 @@ export default {
 					description:
 						"Manage authors ... well I don't have much to say about this",
 					color: "black"
+				},
+				{
+					title: "Slider",
+					page: "Slider",
+					description:
+						"Manage home page slider ... Because we need some boobs to keep us watching",
+					color: "cyan"
 				}
 			]
 		};

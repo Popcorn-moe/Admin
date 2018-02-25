@@ -5,6 +5,7 @@ import Tags from "../components/tags/Tags";
 import Users from "../components/users/Users";
 import News from "../components/news/News";
 import Authors from "../components/authors/Authors";
+import Slider from "../components/slider/Slider.vue";
 import { AddAnime, ListAnime, EditAnime } from "../components/animes";
 
 Vue.use(Router);
@@ -27,6 +28,12 @@ export const routes = [
 		path: "/news",
 		name: "News",
 		component: News
+	},
+	{
+		icon: "images",
+		path: "/slider",
+		name: "Slider",
+		component: Slider
 	},
 	{
 		icon: "video_library",
@@ -81,9 +88,10 @@ function convert(routes) {
 		if (v.submenus) {
 			v.submenus.forEach(s => {
 				s.path = v.path + s.path;
-				s.meta = {};
-				s.meta.parent = v.name;
-				s.meta.submenus = v.submenus.filter(s => !s.hide).map(s => s.name);
+				s.meta = {
+					parent: v.name,
+					submenus: v.submenus.filter(s => !s.hide).map(s => s.name)
+				};
 				newRoutes.push(s);
 			});
 		} else newRoutes.push(v);
