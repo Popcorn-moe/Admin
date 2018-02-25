@@ -1,9 +1,14 @@
 <template>
-  <v-app :light="!darkTheme" :dark="darkTheme">
-    <layout v-if="me && me.group === 'ADMIN'"></layout>
-    <div v-else-if="me === null" class="unauthorized">
-      Unauthorized
-      {{ me }}
+  <v-app v-if="me && me.group === 'ADMIN'" :light="!darkTheme" :dark="darkTheme">
+    <layout></layout>
+  </v-app>
+  <v-app v-else dark>
+    <div class="unauthorized">
+      <div class="unauthorized_image">
+        <img src="https://media.giphy.com/media/njYrp176NQsHS/giphy.gif" frameBorder="0"></img>
+      </div>
+      <h3>You are not allowed to see this page.</h3>
+      <p v-if="me">Poor little {{ me.login }}...</p>
     </div>
   </v-app>
 </template>
@@ -35,6 +40,7 @@ export default {
 				{
 					me {
 						group
+						login
 					}
 				}
 			`,
@@ -43,3 +49,26 @@ export default {
 	}
 };
 </script>
+
+<style lang="stylus">
+
+  .unauthorized {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%,-50%);
+    
+    .unauthorized_image {
+      width: 100%;
+      height: auto;
+    }
+    
+    h3 {
+    	text-align: center;
+    }
+    p {
+    	text-align: center;
+    }
+  }
+  
+</style>
