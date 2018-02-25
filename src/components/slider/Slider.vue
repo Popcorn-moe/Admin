@@ -17,19 +17,19 @@
                     </v-btn>
                     <span>Ajouter une slide après la slide courante</span>
                   </v-tooltip>
-                  <v-btn icon flat small fab >
+                  <v-btn icon flat small fab @click.stop="removeCurrentSlide">
                     <v-icon>delete</v-icon>
                   </v-btn>
                 </v-flex>
                 <v-flex xs1 >
                   <v-tooltip bottom>
-                    <v-btn icon flat small fab slot="activator">
+                    <v-btn icon flat small fab slot="activator" @click.stop="$refs.slider.prev()">
                       <v-icon>keyboard_arrow_left</v-icon>
                     </v-btn>
                     <span>Deplacer vers la gauche la slide</span>
                   </v-tooltip>
                   <v-tooltip bottom>
-                    <v-btn icon flat small fab slot="activator">
+                    <v-btn icon flat small fab slot="activator" @click.stop="$refs.slider.next()">
                       <v-icon>keyboard_arrow_right</v-icon>
                     </v-btn>
                     <span>Deplacer vers la droite la slide</span>
@@ -37,7 +37,7 @@
                 </v-flex>
               </v-layout>
             </div>
-            <v-carousel class="white--text" :cycle="play">
+            <v-carousel v-model="slider" ref="slider" class="white--text" :cycle="play">
               <v-carousel-item v-for="(img,i) in news" :src="img" :key="i"></v-carousel-item>
             </v-carousel>
           </v-expansion-panel-content>
@@ -48,7 +48,7 @@
           <v-card-title primary-title>
             <v-layout row wrap>
               <v-flex xs12>
-                <h3 class="headline mb-0">Slide X</h3>
+                <h3 class="headline mb-0">Slide {{ slider + 1 }}</h3>
               </v-flex>
               <v-flex xs6>
                 <v-text-field label="Title"></v-text-field>
@@ -98,8 +98,14 @@ export default {
 				"https://ib3.hulu.com/show_key_art/12104?size=1600x600&region=US"
 			],
 			play: true,
-			description: ""
+			description: "",
+			slider: 0
 		};
+	},
+	methods: {
+		removeCurrentSlide() {
+			this.news.splice(this.slider, 1);
+		}
 	},
 	components: {
 		VTextField,
