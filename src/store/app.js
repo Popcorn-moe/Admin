@@ -1,3 +1,5 @@
+import "unhandled-rejection-polyfill/src/auto";
+
 export const TOGGLE_DRAWER = "TOGGLE_DRAWER";
 export const SET_DARK_THEME = "DARK_THEME";
 export const SET_ERROR = "ERROR";
@@ -23,6 +25,14 @@ export function onLoad(store) {
 		},
 		false
 	);
+
+	window.addEventListener("unhandledrejection", event => {
+		console.warn(
+			"WARNING: Unhandled promise rejection. Shame on you! Reason:",
+			event.reason
+		);
+		store.commit(SET_ERROR, event.reason);
+	});
 }
 
 const mutations = {
