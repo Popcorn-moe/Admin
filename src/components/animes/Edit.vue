@@ -20,7 +20,7 @@
 					</v-toolbar>
 					<v-divider></v-divider>
 					<v-expansion-panel popout>
-						<v-expansion-panel-content v-for="(season,i) in anime.seasons" :key="i">
+						<v-expansion-panel-content v-for="(season,i) in anime.seasons" :key="i" v-if="season">
 						<div slot="header">Season {{ i + 1 }}: {{ season.name }}</div>
 						<v-card>
 							<v-toolbar card prominent>
@@ -179,28 +179,30 @@ export default {
 			this.newSeason.season = 0;
 		},
 		addEpisode(season) {
-			this.$apollo.mutate({
-				mutation: gql`
-					mutation(
-						$media: MediaInput!
-						$anime: ID!
-						$season: Int!
-						$episode: Int!
-					) {
-						addMedia(media: $media) {
-							linkTo(anime: $anime, season: $season, episode: $episode)
+			this.$apollo
+				.mutate({
+					mutation: gql`
+						mutation(
+							$media: MediaInput!
+							$anime: ID!
+							$season: Int!
+							$episode: Int!
+						) {
+							addMedia(media: $media) {
+								linkTo(anime: $anime, season: $season, episode: $episode)
+							}
+						}
+					`,
+					variables: {
+						anime: this.anime.id,
+						season,
+						episode: this.anime.seasons[season].episodes.length,
+						media: {
+							type: "EPISODE"
 						}
 					}
-				`,
-				variables: {
-					anime: this.anime.id,
-					season,
-					episode: this.anime.seasons[season].episodes.length,
-					media: {
-						type: "EPISODE"
-					}
-				}
-			});
+				})
+				.then(_ => this.$apollo.queries.anime.refetch());
 		},
 		saveEpisodes(season) {
 			const toSave = this.anime.seasons[season].episodes.filter(e => e.changed);
