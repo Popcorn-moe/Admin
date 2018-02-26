@@ -2,10 +2,10 @@
   <v-app v-if="me && me.group === 'ADMIN'" :light="!darkTheme" :dark="darkTheme">
     <layout></layout>
   </v-app>
-  <v-app v-else dark>
+  <v-app v-else-if="me !== false" dark>
     <div class="unauthorized">
       <div class="unauthorized_image">
-        <img src="https://media.giphy.com/media/njYrp176NQsHS/giphy.gif" frameBorder="0"></img>
+        <img src="https://media.giphy.com/media/njYrp176NQsHS/giphy.gif" frameBorder="0">
       </div>
       <h3>You are not allowed to see this page.</h3>
       <p v-if="me">Poor little {{ me.login }}...</p>
