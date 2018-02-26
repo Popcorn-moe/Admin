@@ -12,7 +12,7 @@
                     <v-icon>{{ play ? "pause" : "play_arrow" }}</v-icon>
                   </v-btn>
                   <v-tooltip bottom>
-                    <v-btn icon flat small fab slot="activator">
+                    <v-btn icon flat small fab slot="activator" @click.stop="add()">
                       <v-icon>add</v-icon>
                     </v-btn>
                     <span>Ajouter une slide après la slide courante</span>
@@ -21,15 +21,15 @@
                     <v-icon>delete</v-icon>
                   </v-btn>
                 </v-flex>
-                <v-flex xs1 >
+                <v-flex lg2>
                   <v-tooltip bottom>
-                    <v-btn icon flat small fab slot="activator" @click.stop="$refs.slider.prev()">
+                    <v-btn icon flat small fab slot="activator" @click.stop="">
                       <v-icon>keyboard_arrow_left</v-icon>
                     </v-btn>
                     <span>Deplacer vers la gauche la slide</span>
                   </v-tooltip>
                   <v-tooltip bottom>
-                    <v-btn icon flat small fab slot="activator" @click.stop="$refs.slider.next()">
+                    <v-btn icon flat small fab slot="activator" @click.stop="">
                       <v-icon>keyboard_arrow_right</v-icon>
                     </v-btn>
                     <span>Deplacer vers la droite la slide</span>
@@ -37,8 +37,14 @@
                 </v-flex>
               </v-layout>
             </div>
-            <v-carousel v-model="slider" ref="slider" class="white--text" :cycle="play">
-              <v-carousel-item v-for="(img,i) in news" :src="img" :key="i"></v-carousel-item>
+            <v-carousel v-model="slide" class="white--text" :cycle="play" ref="slider">
+              <v-carousel-item v-if="slides.length == 0">
+                <h1 class="text-xs-center">Slider Vide</h1>
+              </v-carousel-item>
+              <v-carousel-item v-else v-for="(v, i) in slides" :src="v.image">
+                <h1>{{ v.title }}</h1>
+                <p>{{ v.desc }}</p>
+              </v-carousel-item>
             </v-carousel>
           </v-expansion-panel-content>
         </v-expansion-panel>
@@ -46,15 +52,26 @@
       <v-flex xs12>
         <v-card>
           <v-card-title primary-title>
-            <v-layout row wrap>
+            <h3 v-if="slides.length == 0" class="headline mb-0"> Aucune Slide</h3>
+            <v-layout row wrap v-else>
               <v-flex xs12>
-                <h3 class="headline mb-0">Slide {{ slider + 1 }}</h3>
+                <h3 class="headline mb-0">Slide {{ slide + 1 }}</h3>
               </v-flex>
               <v-flex xs6>
-                <v-text-field label="Title"></v-text-field>
+                <v-text-field label="Title" v-model="slides[slide].title"></v-text-field>
               </v-flex>
               <v-flex xs6>
-                <v-text-field label="Image"></v-text-field>
+                <v-layout>
+                  <v-flex xs1>
+                    <v-btn top icon color="primary" class="slide-upload-icon">
+                      <v-icon>file_upload</v-icon>
+                      <input type="file" @change="$input => changeImage($input)">
+                    </v-btn>
+                  </v-flex>
+                  <v-flex xs11>
+                    <v-text-field label="Image"></v-text-field>
+                  </v-flex>
+                </v-layout>
               </v-flex>
               <v-flex xs12>
                 <v-subheader>Description</v-subheader>
@@ -87,24 +104,91 @@ import {
 	VSubheader
 } from "vuetify/es5/components";
 import { mavonEditor as MavonEditor } from "mavon-editor";
+import gql from "graphql-tag";
+
+/*
+
+[
+				"https://images6.alphacoders.com/505/thumb-1920-505441.jpg",
+				"https://images4.alphacoders.com/706/thumb-1920-706365.png",
+				"https://ib3.hulu.com/show_key_art/12104?size=1600x600&region=US"
+			]
+
+ */
+
+const EDIT_SLIDE = gql`
+	mutation($id: ID!, $slide: SlideInput!) {
+		result: editSlide(id: $id, slide: $slide) {
+			error
+		}
+	}
+`;
+const ADD_SLIDE = gql`
+	mutation($slide: SlideInput!) {
+		result: addSlide(slide: $slide) {
+			error
+		}
+	}
+`;
 
 export default {
 	name: "Slider",
 	data() {
 		return {
-			news: [
-				"https://images6.alphacoders.com/505/thumb-1920-505441.jpg",
-				"https://images4.alphacoders.com/706/thumb-1920-706365.png",
-				"https://ib3.hulu.com/show_key_art/12104?size=1600x600&region=US"
-			],
-			play: true,
+			slides: [],
+			play: false,
 			description: "",
-			slider: 0
+			slide: 0
 		};
 	},
+	apollo: {
+		slides: {
+			query: gql`
+				{
+					slider {
+						id
+						title
+						desc
+						image
+					}
+				}
+			`,
+			update: ({ slider }) => slider.map(n => Object.assign({}, n))
+		}
+	},
 	methods: {
+		add() {
+			this.slides.push({
+				image: "",
+				title: "",
+				desc: ""
+			});
+			this.slide++;
+		},
+		changeImage({ target: { files: [file] } }) {
+			this.save({ ...this.slides[this.slide], file });
+		},
 		removeCurrentSlide() {
-			this.news.splice(this.slider, 1);
+			this.slides.splice(this.slider, 1);
+		},
+		save(data) {
+			const { id, title, desc, file } = data;
+			this.$apollo
+				.mutate({
+					mutation: id ? EDIT_SLIDE : ADD_SLIDE,
+					variables: {
+						id,
+						slide: {
+							id,
+							title,
+							desc,
+							image: file
+						}
+					}
+				})
+				.then(({ data: { result } }) => {
+					console.log(result);
+				});
 		}
 	},
 	components: {
@@ -127,3 +211,22 @@ export default {
 	}
 };
 </script>
+
+
+<style lang="stylus">
+  @import "../../stylus/main.styl";
+
+  .slide-upload-icon {
+    input[type=file] {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      outline: none;
+      cursor: inherit;
+      display: block;
+    }
+  }
+</style>

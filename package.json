@@ -37,6 +37,7 @@
 				"graphql": "^0.13.1",
 				"graphql-tag": "^2.8.0",
 				"mavon-editor": "^2.4.16",
+				"md5": "^2.2.1",
 				"moment": "^2.20.1",
 				"unhandled-rejection-polyfill": "^1.0.5",
 				"vue": "^2.5.13",
