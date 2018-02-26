@@ -37,11 +37,11 @@
                 </v-flex>
               </v-layout>
             </div>
-            <v-carousel v-model="slide" class="white--text" :cycle="play" ref="slider">
+            <v-carousel v-model="slide" class="white--text" :cycle="play" :key="slides.length == 0">
               <v-carousel-item v-if="slides.length == 0">
                 <h1 class="text-xs-center">Slider Vide</h1>
               </v-carousel-item>
-              <v-carousel-item v-else v-for="(v, i) in slides" :src="v.image">
+              <v-carousel-item v-else v-for="(v, i) in slides" :src="v.image" :key="i">
                 <h1>{{ v.title }}</h1>
                 <p>{{ v.desc }}</p>
               </v-carousel-item>
@@ -159,17 +159,22 @@ export default {
 	methods: {
 		add() {
 			this.slides.push({
-				image: "",
-				title: "",
-				desc: ""
+				image: null,
+				title: null,
+				desc: null
 			});
-			this.slide++;
+			this.$nextTick(_ => {
+				this.slide++;
+				if (this.slide >= this.slides.length)
+					this.slide = this.slide = this.slides.length - 1;
+			});
 		},
 		changeImage({ target: { files: [file] } }) {
 			this.save({ ...this.slides[this.slide], file });
 		},
 		removeCurrentSlide() {
-			this.slides.splice(this.slider, 1);
+			this.slides.splice(this.slide, 1);
+			if (this.slide >= this.slides.length) this.slide--;
 		},
 		save(data) {
 			const { id, title, desc, file } = data;
