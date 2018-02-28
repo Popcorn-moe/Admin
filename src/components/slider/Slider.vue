@@ -17,19 +17,19 @@
                     </v-btn>
                     <span>Ajouter une slide après la slide courante</span>
                   </v-tooltip>
-                  <v-btn icon flat small fab @click.stop="removeCurrentSlide">
+                  <v-btn icon flat small fab @click.stop="removeCurrentSlide" :disabled="slides.length == 0">
                     <v-icon>delete</v-icon>
                   </v-btn>
                 </v-flex>
                 <v-flex lg2>
                   <v-tooltip bottom>
-                    <v-btn icon flat small fab slot="activator" @click.stop="">
+                    <v-btn icon flat small fab slot="activator" @click.stop="" :disabled="slides.length < 2">
                       <v-icon>keyboard_arrow_left</v-icon>
                     </v-btn>
                     <span>Deplacer vers la gauche la slide</span>
                   </v-tooltip>
                   <v-tooltip bottom>
-                    <v-btn icon flat small fab slot="activator" @click.stop="">
+                    <v-btn icon flat small fab slot="activator" @click.stop="" :disabled="slides.length < 2">
                       <v-icon>keyboard_arrow_right</v-icon>
                     </v-btn>
                     <span>Deplacer vers la droite la slide</span>
@@ -42,8 +42,14 @@
                 <h1 class="text-xs-center">Slider Vide</h1>
               </v-carousel-item>
               <v-carousel-item v-else v-for="(v, i) in slides" :src="v.image" :key="i">
-                <h1>{{ v.title }}</h1>
-                <p>{{ v.desc }}</p>
+                <div class="slide-content">
+                  <v-layout v-if="v.title">
+                    <v-flex class="title" xs6 lg3 md3>{{ v.title }}</v-flex>
+                  </v-layout>
+                  <v-layout v-if="v.desc">
+                    <v-flex class="desc" v-html="desc(v.desc)" xs12 lg6 md6></v-flex>
+                  </v-layout>
+                </div>
               </v-carousel-item>
             </v-carousel>
           </v-expansion-panel-content>
@@ -69,16 +75,16 @@
                     </v-btn>
                   </v-flex>
                   <v-flex xs11>
-                    <v-text-field label="Image"></v-text-field>
+                    <v-text-field label="Image" v-model="slides[slide].image"></v-text-field>
                   </v-flex>
                 </v-layout>
               </v-flex>
               <v-flex xs12>
                 <v-subheader>Description</v-subheader>
-                <mavon-editor language="en" v-model="description"></mavon-editor>
+                <mavon-editor language="en" v-model="slides[slide].desc"></mavon-editor>
               </v-flex>
-              <v-flex xs1 offset-xs11>
-                <v-btn color="primary" block>Save</v-btn>
+              <v-flex xs2 offset-xs10>
+                <v-btn color="primary" block @click.stop="save()">Save</v-btn>
               </v-flex>
             </v-layout>
           </v-card-title>
@@ -105,29 +111,22 @@ import {
 } from "vuetify/es5/components";
 import { mavonEditor as MavonEditor } from "mavon-editor";
 import gql from "graphql-tag";
-
-/*
-
-[
-				"https://images6.alphacoders.com/505/thumb-1920-505441.jpg",
-				"https://images4.alphacoders.com/706/thumb-1920-706365.png",
-				"https://ib3.hulu.com/show_key_art/12104?size=1600x600&region=US"
-			]
-
- */
+import marked from "marked";
 
 const EDIT_SLIDE = gql`
 	mutation($id: ID!, $slide: SlideInput!) {
-		result: editSlide(id: $id, slide: $slide) {
-			error
-		}
+		id: editSlide(id: $id, slide: $slide)
 	}
 `;
 const ADD_SLIDE = gql`
 	mutation($slide: SlideInput!) {
-		result: addSlide(slide: $slide) {
-			error
-		}
+		id: addSlide(slide: $slide)
+	}
+`;
+
+const DEL_SLIDE = gql`
+	mutation($id: ID!) {
+		id: delSlide(id: $id)
 	}
 `;
 
@@ -150,6 +149,7 @@ export default {
 						title
 						desc
 						image
+						index
 					}
 				}
 			`,
@@ -157,42 +157,58 @@ export default {
 		}
 	},
 	methods: {
+		desc(desc) {
+			return marked(desc, { sanitize: true });
+		},
 		add() {
-			this.slides.push({
-				image: null,
-				title: null,
-				desc: null
+			this.slide++;
+			if (this.slide >= this.slides.length) this.slide = this.slides.length;
+			this.slides.splice(this.slide, 0, {
+				image: "",
+				title: "",
+				desc: ""
 			});
-			this.$nextTick(_ => {
-				this.slide++;
-				if (this.slide >= this.slides.length)
-					this.slide = this.slide = this.slides.length - 1;
-			});
+			this.slides[this.slide].index = this.slide;
+			this.save();
 		},
 		changeImage({ target: { files: [file] } }) {
-			this.save({ ...this.slides[this.slide], file });
+			this.slides[this.slide].file = file;
+			this.save();
 		},
 		removeCurrentSlide() {
-			this.slides.splice(this.slide, 1);
-			if (this.slide >= this.slides.length) this.slide--;
+			const id = this.slides[this.slide].id;
+			console.log(id);
+			this.$apollo
+				.mutate({
+					mutation: DEL_SLIDE,
+					variables: { id }
+				})
+				.then(({ data: { id } }) => {
+					if (id) {
+						this.slides.splice(this.slide, 1);
+						if (this.slide >= this.slides.length) this.slide--;
+						this.$apollo.queries.slides.refetch();
+					}
+				});
 		},
-		save(data) {
-			const { id, title, desc, file } = data;
+		save() {
+			const { id, title, desc, file, index } = this.slides[this.slide];
 			this.$apollo
 				.mutate({
 					mutation: id ? EDIT_SLIDE : ADD_SLIDE,
 					variables: {
 						id,
 						slide: {
-							id,
 							title,
 							desc,
-							image: file
+							image: file,
+							index
 						}
 					}
 				})
-				.then(({ data: { result } }) => {
-					console.log(result);
+				.then(({ data: { id } }) => {
+					this.slides[this.slide].id = id;
+					this.$apollo.queries.slides.refetch();
 				});
 		}
 	},
@@ -232,6 +248,25 @@ export default {
       outline: none;
       cursor: inherit;
       display: block;
+    }
+  }
+
+  .slide-content {
+    margin-left 30px;
+    margin-right 30px;
+    margin-top 30vh !important
+    .title {
+      font-size 25pt !important
+      background-color rgba(38, 38, 38, 0.68)
+      padding-left 15px;
+      padding-right 15px;
+    }
+
+    .desc {
+      margin-top 10px
+      background-color rgba(38, 38, 38, 0.48)
+      padding-left 15px;
+      padding-right 15px;
     }
   }
 </style>
