@@ -7,9 +7,9 @@
 		@setCover="file => anime.background = file"
 		@setPoster="file => anime.cover = file"
 	></anime-head>
-	<v-container>
-		<v-layout row fluid>
-			<v-flex offset-md1 md10>
+	<v-container grid-list-md>
+		<v-layout row wrap>
+			<v-flex md12>
 				<v-card>
 					<v-toolbar card prominent>
 						<v-toolbar-title class="body-2 grey--text">Seasons</v-toolbar-title>
@@ -75,6 +75,61 @@
 					</v-expansion-panel>
 				</v-card>
 			</v-flex>
+      <v-flex md12>
+        <v-expansion-panel prominent>
+          <v-expansion-panel-content>
+            <div slot="header">
+              Musics
+              <v-btn icon @click.stop="getOpenings()">
+                <v-icon>get_app</v-icon>
+              </v-btn>
+              <v-btn icon @click.stop="">
+                <v-icon>add</v-icon>
+              </v-btn>
+              <v-btn icon @click.stop="saveOpenings()">
+                <v-icon>save</v-icon>
+              </v-btn>
+            </div>
+            <v-divider></v-divider>
+            <v-card>
+              <v-data-table
+                :headers="openingsHeaders"
+                :items="anime.medias"
+                hide-actions
+                class="elevation-1"
+              >
+                <template slot="items" slot-scope="props">
+                  <td>{{ props.index + 1 }}</td>
+                  <td>
+                    <v-edit-dialog lazy>
+                      {{ props.item.name || "(empty)" }}
+                      <v-text-field
+                        slot="input"
+                        v-model="props.item.name"
+                        @change="() => props.item.changed = true"
+                        single-line
+                      ></v-text-field>
+                    </v-edit-dialog>
+                  </td>
+                  <td>{{ props.item.type }}</td>
+                  <td>{{ props.item.posted_date }}</td>
+                  <td>
+                    <v-edit-dialog lazy>
+                      {{ props.item.content || "(empty)" }}
+                      <v-text-field
+                        slot="input"
+                        v-model="props.item.content"
+                        @change="() => props.item.changed = true"
+                        single-line
+                      ></v-text-field>
+                    </v-edit-dialog>
+                  </td>
+                </template>
+              </v-data-table>
+            </v-card>
+          </v-expansion-panel-content>
+        </v-expansion-panel>
+      </v-flex>
 		</v-layout>
 		<v-dialog v-model="newSeason.dialog" max-width="500px">
 			<v-card>
@@ -85,7 +140,7 @@
 					<v-container grid-list-md>
 						<v-layout wrap>
 							<v-flex xs12>
-								<v-text-field label="Name"  v-model="newSeason.name" required></v-text-field>
+								<v-text-field label="Name" v-model="newSeason.name" required></v-text-field>
 							</v-flex>
 							<v-flex xs12>
 								<v-text-field label="Season" type="number" v-model="newSeason.season" required></v-text-field>
@@ -95,7 +150,8 @@
 				</v-card-text>
 				<v-card-actions>
 					<v-spacer></v-spacer>
-					<v-btn color="green darken-1" flat @click.native="addSeason">Add</v-btn>
+          <v-btn flat @click.stop="newSeason.dialog=false">Close</v-btn>
+					<v-btn color="primary darken-1" @click.native="addSeason">Add</v-btn>
 				</v-card-actions>
 			</v-card>
 		</v-dialog>
@@ -135,6 +191,20 @@ import AnimeHead from "./AnimeHead";
 import gql from "graphql-tag";
 import clone from "clone";
 
+const UPDATE_MEDIA = gql`
+	mutation($id: ID!, $media: MediaUpdate!) {
+		updateMedia(id: $id, media: $media)
+	}
+`;
+
+const ADD_MEDIA = gql`
+	mutation($media: MediaInput!, $anime: ID!) {
+		addMedia(media: $media) {
+			linkTo(anime: $anime)
+		}
+	}
+`;
+
 export default {
 	props: ["id"],
 	data() {
@@ -151,10 +221,79 @@ export default {
 				{ text: "Type", value: "type" },
 				{ text: "Posted Date", value: "posted_date" },
 				{ text: "Content", value: "content" }
+			],
+			openingsHeaders: [
+				{ text: "Num", value: "idx" },
+				{ text: "Name", value: "name" },
+				{ text: "Type", value: "type" },
+				{ text: "Posted Date", value: "posted_date" },
+				{ text: "Content", value: "content" }
 			]
 		};
 	},
 	methods: {
+		opneningRegEx(name) {
+			return new RegExp(
+				`^(?=.*${name
+					.split(" ")
+					.map(str => str.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&"))
+					.join(")(?=.*")}).*$`,
+				"i"
+			);
+		},
+		hasJapanChar(word) {
+			return (
+				word
+					.split("")
+					.filter(
+						c =>
+							(c > "\u3040" && c < "\u4DBF") || (c > "\u4e00" && c < "\u9faf")
+					).length > 0
+			);
+		},
+		getOpenings() {
+			const names = this.anime.names.filter(n => !this.hasJapanChar(n));
+			fetch(
+				"https://cors-anywhere.herokuapp.com/http://openings.moe/api/list.php"
+			)
+				.then(res => res.json())
+				.then(res => {
+					const results = names.map(n =>
+						res.filter(({ source }) => this.opneningRegEx(n).test(source))
+					);
+					const openings =
+						results.length === 0
+							? {}
+							: results.sort((a, b) => (a.length > b.length ? -1 : 0))[0];
+					openings.forEach(({ song, title, file }) => {
+						console.log(this.anime);
+						const type = title.split(" ")[0].toUpperCase();
+						const content = `http://openings.moe/video/${file}`;
+						this.anime.medias.push({
+							name: (song && song.title) || title,
+							type,
+							content,
+							changed: true
+						});
+					});
+				});
+		},
+		saveOpenings() {
+			const toSave = this.anime.medias.filter(e => e.changed);
+			toSave.forEach(e => delete e.changed);
+			Promise.all(
+				toSave.map(({ id, name, type, content }) => {
+					return this.$apollo.mutate({
+						mutation: id ? UPDATE_MEDIA : ADD_MEDIA,
+						variables: {
+							anime: !id ? this.anime.id : undefined,
+							id: id ? id : undefined,
+							media: { name, type, content }
+						}
+					});
+				})
+			).then(_ => this.$apollo.queries.anime.refetch());
+		},
 		addSeason() {
 			this.newSeason.dialog = false;
 			this.$apollo
@@ -236,6 +375,13 @@ export default {
 						authors {
 							id
 							name
+						}
+						medias {
+							id
+							name
+							type
+							posted_date
+							content
 						}
 						seasons {
 							name
