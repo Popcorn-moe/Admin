@@ -264,7 +264,7 @@ export default {
 					const openings =
 						results.length === 0
 							? {}
-							: results.sort((a, b) => (a.length > b.length ? -1 : 0))[0];
+							: results.sort((a, b) => a.length < b.length)[0];
 					openings.forEach(({ song, title, file }) => {
 						console.log(this.anime);
 						const type = title.split(" ")[0].toUpperCase();
