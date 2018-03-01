@@ -4,28 +4,32 @@
 		<v-icon class="upload-icon">file_upload</v-icon>
 		<preview :value="cover" alt="cover" width="100%"></preview>
 	</upload>
-	<div class="anime-poster">
+	<div class="anime-infos">
 		<upload class="anime-poster-img" @input="([file]) => $emit('setPoster', file)">
 			<v-icon class="upload-icon">file_upload</v-icon>
 			<preview :value="poster" alt="poster"></preview>
 		</upload>
-		<h3 class="uppercase">{{ names && names[0] }}</h3>
+		<h3>
+      <slot name="title"></slot>
+    </h3>
 	</div>
   </div>
 </template>
 
 <script>
-import { VIcon } from "vuetify/es5/components";
+import { VIcon, VSelect, VChip } from "vuetify/es5/components";
 import Preview from "./Preview";
 import Upload from "./Upload";
 
 export default {
 	name: "AnimeHead",
-	props: ["names", "cover", "poster"],
+	props: ["cover", "poster", "edit"],
 	components: {
 		VIcon,
 		Preview,
-		Upload
+		Upload,
+		VSelect,
+		VChip
 	}
 };
 </script>
@@ -78,33 +82,65 @@ export default {
 			}
 		}
 
-		.anime-poster {
-			padding-top: 30px;
+    .anime-infos {
+      text-align: justify;
+      padding-right: 10px;
+      min-height 180px;
+      width 100%
 
-			.anime-poster-img {
-				display: inline-block;
-				z-index: 2;
-				box-shadow: 0px 2px 12px 0px rgba(16,16,17,0.5);
-				margin-right: 18px;
-				margin-top: -105px;
-				margin-left: 8.333333333333332%;
-				width: 180px;
-				height: 250px;
+      .anime-poster-img {
+        display: inline-block;
+        z-index: 2;
+        box-shadow: 0px 2px 12px 0px rgba(16,16,17,0.5);
+        margin-right: 10px;
+        margin-top: -105px;
+        margin-left: 8.333333333333332%;
+        width: 180px;
+        height: 250px;
+        float left
 
-				img {
-					height: 100%;
-					position: absolute;
-				}
+        .upload-icon {
+          z-index: 2;
+          margin-top: 2px;
+          height: 255px;
+        }
+      }
 
-				.upload-icon {
-					z-index: 2;
-				}
-			}
+      .names {
+        width auto;
+      }
 
-			h3 {
-				display: inline;
-				vertical-align: top;
-			}
-		}
+      ul, h3 {
+        margin-top 15px;
+        margin-bottom: 3px;
+      }
+
+      li {
+        display inline-block
+        list-style: none;
+      }
+
+      .list-name {
+        float: left;
+        padding-right: 3px;
+        font-weight: bold;
+      }
+
+      .list-name:before {
+        float: right;
+
+      }
+
+      .sub {
+        padding-top: 3px;
+        margin-bottom: 15px;
+      }
+
+      p {
+        padding-top: 30px;
+        padding-left: 15px;
+        padding-right: 15px;
+      }
+    }
 	}
 </style>

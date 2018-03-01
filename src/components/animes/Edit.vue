@@ -1,14 +1,131 @@
 <template>
   <div v-if="anime" class="edit-page">
 	<anime-head
-		:names="anime.names"
 		:cover="anime.background"
 		:poster="anime.cover"
+    edit="true"
 		@setCover="file => anime.background = file"
 		@setPoster="file => anime.cover = file"
-	></anime-head>
+	>
+    <div slot="title">
+      <v-layout row wrap>
+        <v-flex xs12>
+          <v-select
+            label="Names"
+            chips
+            tags
+            solo
+            append-icon=""
+            clearable
+            v-model="anime.names"
+            class="names"
+          >
+            <template slot="selection" slot-scope="data">
+              <v-chip
+                color="primary"
+                close
+                outline
+                label
+                @input="removeName(data.item)"
+                :selected="data.selected"
+              >
+                <strong>{{ data.item }}</strong>&nbsp;
+              </v-chip>
+            </template>
+          </v-select>
+        </v-flex>
+        <v-flex xs4>
+          <v-select
+            :items="animesStatus"
+            v-model="currentStatus"
+            label="Anime status"
+          ></v-select>
+        </v-flex>
+        <v-flex xs4>
+          <v-select
+            label="Select Tags"
+            :items="tags"
+            v-model="selectedTags"
+            item-text="name"
+            item-value="id"
+            class="tags-select"
+            multiple
+            chips
+            autocomplete
+          >
+            <template slot="selection" slot-scope="data">
+              <v-chip
+                close
+                @input="data.parent.selectItem(data.item.id)"
+                :selected="data.selected"
+                class="chip--select-multi"
+                :key="JSON.stringify(data.item)"
+              >
+                <v-avatar :style="{ 'background-color': data.item.color }"></v-avatar>
+                {{ data.item.name }}
+              </v-chip>
+            </template>
+            <template slot="item" slot-scope="data">
+              <v-list-tile-avatar>
+                <div :style="{ 'background-color': data.item.color, 'width': '30px', 'height': '30px', 'border-radius': '50%' }"></div>
+              </v-list-tile-avatar>
+              <v-list-tile-content>
+                <v-list-tile-title v-html="data.item.name"></v-list-tile-title>
+              </v-list-tile-content>
+            </template>
+          </v-select>
+        </v-flex>
+        <v-flex xs4>
+          <v-select
+            label="Select Authors"
+            :items="authors"
+            v-model="selectedAuthors"
+            item-text="name"
+            item-value="id"
+            class="tags-select"
+            multiple
+            chips
+            autocomplete
+          >
+            <template slot="selection" slot-scope="data">
+              <v-chip
+                close
+                @input="data.parent.selectItem(data.item.id)"
+                :selected="data.selected"
+                class="chip--select-multi"
+                :key="JSON.stringify(data.item)"
+              >
+                <v-avatar>
+                  <img :src="data.item.picture">
+                </v-avatar>
+                {{ data.item.name }}
+              </v-chip>
+            </template>
+            <template slot="item" slot-scope="data">
+              <v-list-tile-avatar>
+                <img :src="data.item.picture">
+              </v-list-tile-avatar>
+              <v-list-tile-content>
+                <v-list-tile-title v-html="data.item.name"></v-list-tile-title>
+              </v-list-tile-content>
+            </template>
+          </v-select>
+        </v-flex>
+      </v-layout>
+    </div>
+  </anime-head>
 	<v-container grid-list-md>
 		<v-layout row wrap>
+      <v-flex md12>
+        <v-expansion-panel prominent>
+          <v-expansion-panel-content>
+            <div slot="header">Description</div>
+            <v-card>
+              <mavon-editor language="en" v-model="anime.desc"></mavon-editor>
+            </v-card>
+          </v-expansion-panel-content>
+        </v-expansion-panel>
+      </v-flex>
 			<v-flex md12>
 				<v-card>
 					<v-toolbar card prominent>
@@ -130,6 +247,11 @@
           </v-expansion-panel-content>
         </v-expansion-panel>
       </v-flex>
+      <v-flex md2 offset-md10>
+        <v-btn class="primary" block @click.stop="saveAll()">
+          Save
+        </v-btn>
+      </v-flex>
 		</v-layout>
 		<v-dialog v-model="newSeason.dialog" max-width="500px">
 			<v-card>
@@ -167,7 +289,10 @@ import {
 	VIcon,
 	VDialog,
 	VTextField,
-	VDataTable
+	VDataTable,
+	VSelect,
+	VChip,
+	VAvatar
 } from "vuetify/es5/components";
 import {
 	VCard,
@@ -186,10 +311,16 @@ import {
 	VExpansionPanel,
 	VExpansionPanelContent
 } from "vuetify/es5/components/VExpansionPanel";
+import {
+	VListTileContent,
+	VListTileAvatar,
+	VListTileTitle
+} from "vuetify/es5/components/VList";
 import VEditDialog from "vuetify/es5/components/VDataTable/VEditDialog";
 import AnimeHead from "./AnimeHead";
 import gql from "graphql-tag";
 import clone from "clone";
+import { mavonEditor as MavonEditor } from "mavon-editor";
 
 const UPDATE_MEDIA = gql`
 	mutation($id: ID!, $media: MediaUpdate!) {
@@ -210,6 +341,12 @@ export default {
 	data() {
 		return {
 			anime: null,
+			animesStatus: [],
+			selectedTags: [],
+			selectedAuthors: [],
+			tags: [],
+			authors: [],
+			currentStatus: "Finished",
 			newSeason: {
 				dialog: false,
 				name: null,
@@ -268,10 +405,10 @@ export default {
 					openings.forEach(({ song, title, file }) => {
 						console.log(this.anime);
 						const type = title.split(" ")[0].toUpperCase();
-						const content = `http://openings.moe/video/${file}`;
+						const content = `https://openings.moe/video/${file}`;
 						this.anime.medias.push({
 							name: (song && song.title) || title,
-							type,
+							type: type !== "OPENING" && type !== "ENDING" ? "OST" : type,
 							content,
 							changed: true
 						});
@@ -361,20 +498,95 @@ export default {
 					});
 				})
 			).then(_ => this.$apollo.queries.anime.refetch());
+		},
+		saveAll() {
+			const { id, names, status, desc } = this.anime;
+			this.$apollo
+				.mutate({
+					mutation: gql`
+						mutation($id: ID!, $anime: AnimeInput!) {
+							id: updateAnime(id: $id, anime: $anime)
+						}
+					`,
+					variables: {
+						id,
+						anime: {
+							names,
+							tags: this.selectedTags,
+							authors: this.selectedAuthors,
+							status,
+							desc
+						}
+					}
+				})
+				.then(_ => this.$apollo.queries.anime.refetch());
+		},
+		removeName(name) {
+			this.anime.names.splice(this.anime.names.indexOf(name), 1);
 		}
 	},
 	apollo: {
+		animesStatus: {
+			query: gql`
+				{
+					__type(name: "AnimeStatus") {
+						enumValues {
+							name
+						}
+					}
+				}
+			`,
+			update: ({ __type: { enumValues } }) =>
+				enumValues.map(e =>
+					e.name
+						.split("_")
+						.map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+						.join(" ")
+				)
+		},
+		tags: {
+			query: gql`
+				{
+					tags {
+						id
+						name
+						color
+					}
+				}
+			`,
+			update: ({ tags }) => tags
+		},
+		authors: {
+			query: gql`
+				{
+					authors {
+						id
+						name
+						picture
+					}
+				}
+			`,
+			update: ({ authors }) => authors
+		},
 		anime: {
 			query: gql`
 				query($id: ID!) {
 					anime(id: $id) {
 						id
 						names
+						status
+						desc
 						cover
 						background
+						tags {
+							id
+							name
+							color
+						}
 						authors {
 							id
 							name
+							picture
 						}
 						medias {
 							id
@@ -401,7 +613,15 @@ export default {
 					id: this.id
 				};
 			},
-			update: ({ anime }) => clone(anime)
+			update: function({ anime }) {
+				this.currentStatus = anime.status
+					.split("_")
+					.map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+					.join(" ");
+				this.selectedTags = anime.tags.map(({ id }) => id);
+				this.selectedAuthors = anime.authors.map(({ id }) => id);
+				return clone(anime);
+			}
 		}
 	},
 	components: {
@@ -424,8 +644,15 @@ export default {
 		VSpacer,
 		VExpansionPanel,
 		VExpansionPanelContent,
+		VSelect,
+		VChip,
+		VListTileContent,
+		VListTileAvatar,
+		VListTileTitle,
+		VAvatar,
 		VEditDialog,
-		AnimeHead
+		AnimeHead,
+		MavonEditor
 	}
 };
 </script>

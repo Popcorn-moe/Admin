@@ -62,12 +62,13 @@
         </v-stepper-content>
         <v-stepper-content step="2">
           <anime-head
-            :names="names"
             :cover="cover"
             :poster="poster"
             @setCover="file => cover = file"
             @setPoster="file => poster = file"
-          ></anime-head>
+          >
+            <div slot="title">{{ names && names[0] }}</div>
+          </anime-head>
           <v-layout row wrap>
             <v-flex offset-md11>
               <v-btn color="primary" @click.native="el = 3">Continue</v-btn>
@@ -92,11 +93,11 @@
                   <v-chip
                     close
                     @input="data.parent.selectItem(data.item.id)"
-                    @click.native.stop
+                    :selected="data.selected"
                     class="chip--select-multi"
-                    :key="data.item.id"
+                    :key="JSON.stringify(data.item)"
                   >
-                    <v-list-tile-avatar :style="{ 'background-color': data.item.color }"></v-list-tile-avatar>
+                    <v-avatar :style="{ 'background-color': data.item.color }"></v-avatar>
                     {{ data.item.name }}
                   </v-chip>
                 </template>
@@ -126,17 +127,19 @@
                   <v-chip
                     close
                     @input="data.parent.selectItem(data.item.id)"
-                    @click.native.stop
+                    :selected="data.selected"
                     class="chip--select-multi"
-                    :key="data.item.id"
+                    :key="JSON.stringify(data.item)"
                   >
-                    <v-list-tile-avatar :style="{ 'background-color': data.item.color }"></v-list-tile-avatar>
+                    <v-avatar>
+                      <img :src="data.item.picture">
+                    </v-avatar>
                     {{ data.item.name }}
                   </v-chip>
                 </template>
                 <template slot="item" slot-scope="data">
                   <v-list-tile-avatar>
-                    <div :style="{ 'background-color': data.item.color, 'width': '30px', 'height': '30px', 'border-radius': '50%' }"></div>
+                    <img :src="data.item.picture">
                   </v-list-tile-avatar>
                   <v-list-tile-content>
                     <v-list-tile-title v-html="data.item.name"></v-list-tile-title>
@@ -334,6 +337,7 @@ export default {
 					authors {
 						id
 						name
+						picture
 					}
 				}
 			`,

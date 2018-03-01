@@ -7,7 +7,9 @@
       class="elevation-1"
     >
       <template slot="items" slot-scope="props">
-          <td></td>
+         <td>
+           <img class="author-avatar" :src="props.item.picture">
+         </td>
          <td>
             <v-edit-dialog lazy> {{ props.item.name }}
               <v-text-field
@@ -135,7 +137,7 @@ export default {
 		},
 		saveAuthors() {
 			for (const author of this.authors) {
-				const { id, name, picture, bio, organisation } = author;
+				const { id, name, bio, organisation } = author;
 				this.$apollo
 					.mutate({
 						mutation: id ? UPDATE_AUTHOR : ADD_AUTHOR,
@@ -143,7 +145,6 @@ export default {
 							id,
 							author: {
 								name,
-								picture,
 								bio,
 								organisation
 							}
@@ -151,6 +152,7 @@ export default {
 					})
 					.then(({ data: { id } }) => {
 						author.id = id;
+						this.$apollo.queries.authors.refetch();
 					});
 			}
 			for (const id of this.deleted) {
@@ -192,5 +194,11 @@ export default {
 
   .author-checkbox {
     width: 28px !important;
+  }
+
+  .author-avatar {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
   }
 </style>
