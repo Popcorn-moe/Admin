@@ -23,13 +23,13 @@
                 </v-flex>
                 <v-flex lg2>
                   <v-tooltip bottom>
-                    <v-btn icon flat small fab slot="activator" @click.stop="" :disabled="slides.length < 2">
+                    <v-btn icon flat small fab slot="activator" @click.stop="moveSlide('left')" :disabled="slides.length < 2 || slide < 1">
                       <v-icon>keyboard_arrow_left</v-icon>
                     </v-btn>
                     <span>Deplacer vers la gauche la slide</span>
                   </v-tooltip>
                   <v-tooltip bottom>
-                    <v-btn icon flat small fab slot="activator" @click.stop="" :disabled="slides.length < 2">
+                    <v-btn icon flat small fab slot="activator" @click.stop="moveSlide('right')" :disabled="slides.length < 2 || slide == slides.length - 1">
                       <v-icon>keyboard_arrow_right</v-icon>
                     </v-btn>
                     <span>Deplacer vers la droite la slide</span>
@@ -149,7 +149,6 @@ export default {
 						title
 						desc
 						image
-						index
 					}
 				}
 			`,
@@ -161,15 +160,26 @@ export default {
 			return marked(desc, { sanitize: true });
 		},
 		add() {
-			this.slide++;
-			if (this.slide >= this.slides.length) this.slide = this.slides.length;
-			this.slides.splice(this.slide, 0, {
+			this.slides.splice(Math.min(this.slide + 1, this.slides.length), 0, {
 				image: "",
 				title: "",
 				desc: ""
 			});
-			this.slides[this.slide].index = this.slide;
-			this.save();
+			this.$nextTick(() => {
+				this.slide++;
+				if (this.slide >= this.slides.length)
+					this.slide = this.slides.length - 1;
+			});
+		},
+		moveSlide(direction) {
+			const current = this.slides[this.slide];
+			const oldPos = this.slide;
+			this.slides.splice(this.slide, 1);
+			if (direction === "left") this.slide--;
+			else if (direction === "right") this.slide++;
+			this.slides.splice(this.slide, 0, current);
+			this.save(oldPos);
+			this.save(this.slide);
 		},
 		changeImage({ target: { files: [file] } }) {
 			this.slides[this.slide].file = file;
@@ -177,22 +187,24 @@ export default {
 		},
 		removeCurrentSlide() {
 			const id = this.slides[this.slide].id;
-			console.log(id);
-			this.$apollo
-				.mutate({
-					mutation: DEL_SLIDE,
-					variables: { id }
-				})
-				.then(({ data: { id } }) => {
-					if (id) {
-						this.slides.splice(this.slide, 1);
-						if (this.slide >= this.slides.length) this.slide--;
-						this.$apollo.queries.slides.refetch();
-					}
-				});
+			const removeSlide = () => {
+				this.slides.splice(this.slide, 1);
+				if (this.slide >= this.slides.length)
+					this.slide = Math.max(this.slides.length - 1, 0);
+			};
+			if (id) {
+				this.$apollo
+					.mutate({
+						mutation: DEL_SLIDE,
+						variables: { id }
+					})
+					.then(({ data: { id } }) => {
+						removeSlide();
+					});
+			} else removeSlide();
 		},
-		save() {
-			const { id, title, desc, file, index } = this.slides[this.slide];
+		save(slide = this.slide) {
+			const { id, title, desc, file } = this.slides[slide];
 			this.$apollo
 				.mutate({
 					mutation: id ? EDIT_SLIDE : ADD_SLIDE,
@@ -202,13 +214,13 @@ export default {
 							title,
 							desc,
 							image: file,
-							index
+							index: slide
 						}
 					}
 				})
 				.then(({ data: { id } }) => {
-					this.slides[this.slide].id = id;
-					this.$apollo.queries.slides.refetch();
+					this.slides[slide].id = id;
+					this.slides[slide].index = slide;
 				});
 		}
 	},
