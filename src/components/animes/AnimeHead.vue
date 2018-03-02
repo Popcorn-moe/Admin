@@ -90,7 +90,7 @@ export default {
 
       .anime-poster-img {
         display: inline-block;
-        z-index: 2;
+        z-index: 1;
         box-shadow: 0px 2px 12px 0px rgba(16,16,17,0.5);
         margin-right: 10px;
         margin-top: -105px;
@@ -100,7 +100,7 @@ export default {
         float left
 
         .upload-icon {
-          z-index: 2;
+          z-index: 1;
           margin-top: 2px;
           height: 255px;
         }

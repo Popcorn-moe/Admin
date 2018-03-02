@@ -115,12 +115,22 @@ import marked from "marked";
 
 const EDIT_SLIDE = gql`
 	mutation($id: ID!, $slide: SlideInput!) {
-		id: editSlide(id: $id, slide: $slide)
+		slide: editSlide(id: $id, slide: $slide) {
+			id
+			title
+			desc
+			image
+		}
 	}
 `;
 const ADD_SLIDE = gql`
 	mutation($slide: SlideInput!) {
-		id: addSlide(slide: $slide)
+		slide: addSlide(slide: $slide) {
+			id
+			title
+			desc
+			image
+		}
 	}
 `;
 
@@ -183,7 +193,7 @@ export default {
 		},
 		changeImage({ target: { files: [file] } }) {
 			this.slides[this.slide].file = file;
-			this.save();
+			this.save(this.slide);
 		},
 		removeCurrentSlide() {
 			const id = this.slides[this.slide].id;
@@ -218,9 +228,9 @@ export default {
 						}
 					}
 				})
-				.then(({ data: { id } }) => {
-					this.slides[slide].id = id;
-					this.slides[slide].index = slide;
+				.then(({ data: { slide: newSlide } }) => {
+					console.log(newSlide);
+					this.$set(this.slides, slide, { ...newSlide, index: slide });
 				});
 		}
 	},

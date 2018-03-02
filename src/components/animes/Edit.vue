@@ -126,6 +126,12 @@
           </v-expansion-panel-content>
         </v-expansion-panel>
       </v-flex>
+      <v-flex md2 offset-md10>
+        <v-btn class="primary" block @click.stop="saveAll()">
+          Save
+        </v-btn>
+      </v-flex>
+      <v-divider></v-divider>
 			<v-flex md12>
 				<v-card>
 					<v-toolbar card prominent>
@@ -246,11 +252,6 @@
             </v-card>
           </v-expansion-panel-content>
         </v-expansion-panel>
-      </v-flex>
-      <v-flex md2 offset-md10>
-        <v-btn class="primary" block @click.stop="saveAll()">
-          Save
-        </v-btn>
       </v-flex>
 		</v-layout>
 		<v-dialog v-model="newSeason.dialog" max-width="500px">
