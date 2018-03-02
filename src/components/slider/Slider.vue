@@ -41,7 +41,7 @@
               <v-carousel-item v-if="slides.length == 0">
                 <h1 class="text-xs-center">Slider Vide</h1>
               </v-carousel-item>
-              <v-carousel-item v-else v-for="(v, i) in slides" :src="v.image" :key="i">
+              <v-carousel-item v-else v-for="(v, i) in slides" :src="v.image" ref="items" :key="i">
                 <div class="slide-content">
                   <v-layout v-if="v.title">
                     <v-flex class="title" xs6 lg3 md3>{{ v.title }}</v-flex>
@@ -69,10 +69,11 @@
               <v-flex xs6>
                 <v-layout>
                   <v-flex xs1>
-                    <v-btn top icon color="primary" class="slide-upload-icon">
-                      <v-icon>file_upload</v-icon>
-                      <input type="file" @change="$input => changeImage($input)">
-                    </v-btn>
+										<upload @input="([file]) => changeImage(file)">
+											<v-btn top icon color="primary">
+												<v-icon>file_upload</v-icon>
+											</v-btn>
+										</upload>
                   </v-flex>
                   <v-flex xs11>
                     <v-text-field label="Image" v-model="slides[slide].image"></v-text-field>
@@ -109,6 +110,7 @@ import {
 	VTextField,
 	VSubheader
 } from "vuetify/es5/components";
+import Upload from "../Upload";
 import { mavonEditor as MavonEditor } from "mavon-editor";
 import gql from "graphql-tag";
 import marked from "marked";
@@ -191,7 +193,7 @@ export default {
 			this.save(oldPos);
 			this.save(this.slide);
 		},
-		changeImage({ target: { files: [file] } }) {
+		changeImage(file) {
 			this.slides[this.slide].file = file;
 			this.save(this.slide);
 		},
@@ -228,9 +230,12 @@ export default {
 						}
 					}
 				})
-				.then(({ data: { slide: newSlide } }) => {
-					console.log(newSlide);
-					this.$set(this.slides, slide, { ...newSlide, index: slide });
+				.then(({ data: { slide: { image, ...newSlide } } }) => {
+					this.$set(this.slides, slide, {
+						...newSlide,
+						index: slide,
+						image: `${image}?${new Date().getTime()}`
+					});
 				});
 		}
 	},
@@ -250,6 +255,7 @@ export default {
 		VCarousel,
 		VCarouselItem,
 		VSubheader,
+		Upload,
 		MavonEditor
 	}
 };
@@ -258,20 +264,6 @@ export default {
 
 <style lang="stylus">
   @import "../../stylus/main.styl";
-
-  .slide-upload-icon {
-    input[type=file] {
-      position: absolute;
-      top: 0;
-      right: 0;
-      width: 100%;
-      height: 100%;
-      opacity: 0;
-      outline: none;
-      cursor: inherit;
-      display: block;
-    }
-  }
 
   .slide-content {
     margin-left 30px;

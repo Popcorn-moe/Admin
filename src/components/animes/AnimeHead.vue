@@ -19,7 +19,7 @@
 <script>
 import { VIcon, VSelect, VChip } from "vuetify/es5/components";
 import Preview from "./Preview";
-import Upload from "./Upload";
+import Upload from "../Upload";
 
 export default {
 	name: "AnimeHead",
