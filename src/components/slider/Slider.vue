@@ -230,11 +230,10 @@ export default {
 						}
 					}
 				})
-				.then(({ data: { slide: { image, ...newSlide } } }) => {
+				.then(({ data: { slide: newSlide } }) => {
 					this.$set(this.slides, slide, {
 						...newSlide,
-						index: slide,
-						image: `${image}?${new Date().getTime()}`
+						index: slide
 					});
 				});
 		}
