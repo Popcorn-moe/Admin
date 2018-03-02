@@ -169,7 +169,7 @@ export default {
 	},
 	methods: {
 		desc(desc) {
-			return marked(desc, { sanitize: true });
+			return marked(desc);
 		},
 		add() {
 			this.slides.splice(Math.min(this.slide + 1, this.slides.length), 0, {
