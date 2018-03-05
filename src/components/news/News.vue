@@ -106,7 +106,6 @@
             Save
           </v-btn>
         </v-flex>
-				{{ news }}
       </v-layout>
     </v-container>
   </v-layout>
@@ -271,7 +270,6 @@ export default {
 		},
 		saveNews() {
 			const toSave = this.news.filter(n => n.changed);
-			console.log(toSave);
 			toSave.forEach(e => delete e.changed);
 			Promise.all(
 				toSave
