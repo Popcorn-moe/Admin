@@ -19,14 +19,16 @@
               ></v-text-field>
             </v-edit-dialog>
           </td>
-          <td>
-            <v-edit-dialog lazy> {{ props.item.bio }}
-              <v-text-field
-                slot="input"
-                v-model="props.item.bio"
-                multi-line
-              ></v-text-field>
-            </v-edit-dialog>
+         <td @click.stop="props.item.dialog = !props.item.dialog" class="content_column">
+            Click to edit
+            <v-dialog v-model="props.item.dialog" width="50%">
+              <v-card>
+                <v-card-title class="headline">News Content</v-card-title>
+                <mavon-editor language="en" v-model="props.item.bio"></mavon-editor>
+                <v-spacer></v-spacer>
+                <v-btn class="primary" @click.native="props.item.dialog = false">Save</v-btn>
+              </v-card>
+            </v-dialog>
           </td>
           <td>
             <v-checkbox
@@ -68,7 +70,14 @@ import {
 	VCheckbox
 } from "vuetify/es5/components";
 import VEditDialog from "vuetify/es5/components/VDataTable/VEditDialog";
-import { VContainer, VFlex, VLayout } from "vuetify/es5/components/VGrid";
+import {
+	VContainer,
+	VFlex,
+	VLayout,
+	VSpacer
+} from "vuetify/es5/components/VGrid";
+import { VCard, VCardTitle } from "vuetify/es5/components/VCard";
+import { mavonEditor as MavonEditor } from "mavon-editor";
 import gql from "graphql-tag";
 
 const UPDATE_AUTHOR = gql`
@@ -121,7 +130,11 @@ export default {
 		VDialog,
 		VEditDialog,
 		VTextField,
-		VCheckbox
+		VCheckbox,
+		VSpacer,
+		VCard,
+		VCardTitle,
+		MavonEditor
 	},
 	methods: {
 		removeAuthor(author) {
@@ -132,7 +145,8 @@ export default {
 			this.authors.push({
 				name: "New Author",
 				bio: "An Author",
-				organisation: false
+				organisation: false,
+				dialog: false
 			});
 		},
 		saveAuthors() {
@@ -183,7 +197,8 @@ export default {
 					}
 				}
 			`,
-			update: ({ authors }) => authors.map(author => Object.assign({}, author)) //Clone to avoid seal
+			update: ({ authors }) =>
+				authors.map(author => Object.assign({ dialog: false }, author)) //Clone to avoid seal
 		}
 	}
 };
