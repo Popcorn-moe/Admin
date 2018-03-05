@@ -13,6 +13,7 @@
               <v-text-field
                 slot="input"
                 v-model="props.item.name"
+								@change="() => props.item.changed = true"
                 single-line
               ></v-text-field>
             </v-edit-dialog>
@@ -27,7 +28,7 @@
               <v-flex xs6>
                 <v-btn icon class="main-color news-upload-icon">
                   <v-icon class="white--text">file_upload</v-icon>
-                  <input type="file" @change="$input => changeCover($input, props.item)">
+                  <input type="file" @change="$input => { changeCover($input, props.item); props.item.changed = true}">
                 </v-btn>
               </v-flex>
             </v-layout>
@@ -37,6 +38,7 @@
               class="table-select"
               :items="users.map(u => u.login)"
               @input="v => props.item.author.login"
+							@change="() => props.item.changed = true"
               :value="props.item.author.login"
               single-line
             ></v-select>
@@ -46,10 +48,13 @@
             <v-dialog v-model="props.item.dialog" width="50%">
               <v-card>
                 <v-card-title class="headline">News Content</v-card-title>
-                <mavon-editor language="en" v-model="props.item.content"></mavon-editor>
+                <mavon-editor 
+									language="en"
+									:value="props.item.content"
+									@input="$input => test($input, props.item)"
+								></mavon-editor>
                 <v-spacer></v-spacer>
-                <v-btn primary @click.native="props.item.dialog = false">Save</v-btn>
-                <v-btn class="green--text darken-1" flat="flat" @click.native="props.item.dialog = false">Cancel</v-btn>
+                <v-btn class="primary" @click.native="props.item.dialog = false">Close</v-btn>
               </v-card>
             </v-dialog>
           </td>
@@ -68,6 +73,7 @@
                 slot="activator"
                 label="Picker in menu"
                 v-model="props.item.posted_date"
+								@change="() => props.item.changed = true"
                 prepend-icon="event"
                 single-line
                 readonly
@@ -100,6 +106,7 @@
             Save
           </v-btn>
         </v-flex>
+				{{ news }}
       </v-layout>
     </v-container>
   </v-layout>
@@ -128,7 +135,7 @@ import { mavonEditor as MavonEditor } from "mavon-editor";
 import gql from "graphql-tag";
 
 const UPDATE_NEWS = gql`
-	mutation($id: ID!, $news: NewsUpdate!) {
+	mutation($id: ID!, $news: NewsInput!) {
 		id: updateNews(id: $id, news: $news)
 	}
 `;
@@ -150,7 +157,8 @@ export default {
 				{
 					text: "Cover",
 					align: "left",
-					value: "cover"
+					value: "cover",
+					sortable: false
 				},
 				{
 					text: "Author",
@@ -160,7 +168,8 @@ export default {
 				{
 					text: "Content",
 					align: "left",
-					value: "content"
+					value: "content",
+					sortable: false
 				},
 				{
 					text: "Posted date",
@@ -202,10 +211,10 @@ export default {
 						author {
 							id
 							login
-							group
 						}
 						content
 						cover
+						posted_date
 					}
 				}
 			`,
@@ -218,7 +227,6 @@ export default {
 					me {
 						id
 						login
-						group
 					}
 				}
 			`,
@@ -239,8 +247,12 @@ export default {
 		}
 	},
 	methods: {
+		test($input, items) {
+			if ($input !== items.content) items.content = $input;
+		},
 		changeCover({ target: { files: [file] } }, data) {
-			this.save({ ...data, file });
+			data.cover = file;
+			data.changed = true;
 		},
 		addNews() {
 			this.news.push({
@@ -249,7 +261,8 @@ export default {
 				posted_date: new Date().toISOString().slice(0, 10),
 				content: "",
 				menu: false,
-				dialog: false
+				dialog: false,
+				changed: true
 			});
 		},
 		removeNews(news) {
@@ -257,39 +270,40 @@ export default {
 			if (news.id) this.deleted.push(news.id);
 		},
 		saveNews() {
-			this.news.forEach(n => this.save(n));
-			for (const id of this.deleted) {
-				this.$apollo.mutate({
-					mutation: gql`
-						mutation($id: ID!) {
-							deleteNews(id: $id)
-						}
-					`,
-					variables: {
-						id
-					}
-				});
-			}
-			this.deleted = [];
-		},
-		save(news) {
-			const { id, name, content, author, file } = news;
-			this.$apollo
-				.mutate({
-					mutation: id ? UPDATE_NEWS : ADD_NEWS,
-					variables: {
-						id,
-						news: {
-							name,
-							content,
-							author: author.id,
-							cover: file
-						}
-					}
-				})
-				.then(({ data: { id } }) => {
-					news.id = id;
-				});
+			const toSave = this.news.filter(n => n.changed);
+			console.log(toSave);
+			toSave.forEach(e => delete e.changed);
+			Promise.all(
+				toSave
+					.map(({ id, name, content, author: { id: author }, cover }) =>
+						this.$apollo.mutate({
+							mutation: id ? UPDATE_NEWS : ADD_NEWS,
+							variables: {
+								id: id || undefined,
+								news: {
+									name,
+									content,
+									author,
+									cover: cover || undefined
+								}
+							}
+						})
+					)
+					.concat(
+						this.deleted.map(id =>
+							this.$apollo.mutate({
+								mutation: gql`
+									mutation($id: ID!) {
+										deleteNews(id: $id)
+									}
+								`,
+								variables: {
+									id
+								}
+							})
+						)
+					)
+			).then(() => this.$apollo.queries.news.refetch());
 		}
 	}
 };

@@ -206,7 +206,7 @@
               <v-btn icon @click.stop="getOpenings()">
                 <v-icon>get_app</v-icon>
               </v-btn>
-              <v-btn icon @click.stop="">
+              <v-btn ico disabled>
                 <v-icon>add</v-icon>
               </v-btn>
               <v-btn icon @click.stop="saveOpenings()">
@@ -483,7 +483,8 @@ export default {
 		},
 		saveEpisodes(season) {
 			const toSave = this.anime.seasons[season].episodes.filter(e => e.changed);
-			toSave.forEach(e => delete e.changed);
+			console.log(toSave);
+			//toSave.forEach(e => delete e.changed);
 			Promise.all(
 				toSave.map(({ id, name, type, content }) => {
 					return this.$apollo.mutate({
