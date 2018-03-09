@@ -6,9 +6,11 @@
       <v-stepper-header>
         <v-stepper-step step="1" :complete="el > 1" editable>Names, Description, Status</v-stepper-step>
         <v-divider></v-divider>
-        <v-stepper-step step="2" :complete="el > 2" editable>Cover and Poster</v-stepper-step>
+        <v-stepper-step step="2" :complete="el > 2" editable>Video Trailer</v-stepper-step>
         <v-divider></v-divider>
-        <v-stepper-step step="3" editable>Tags and Authors</v-stepper-step>
+         <v-stepper-step step="3" :complete="el > 3" editable>Cover and Poster</v-stepper-step>
+        <v-divider></v-divider>
+        <v-stepper-step step="4" editable>Tags and Authors</v-stepper-step>
       </v-stepper-header>
       <v-stepper-items>
         <v-stepper-content step="1">
@@ -61,6 +63,26 @@
           </v-layout>
         </v-stepper-content>
         <v-stepper-content step="2">
+          <v-layout row wrap>
+            <v-flex xs12>
+              <v-text-field solo label="trailer url" v-model="trailer"></v-text-field>
+            </v-flex>
+            <v-flex xs12>
+              ​<iframe 
+                width="100%" 
+                height="600px"
+                :src="trailer" 
+                frameborder="0" 
+                allow="autoplay; encrypted-media" 
+                allowfullscreen
+              ></iframe>
+            </v-flex>
+             <v-flex offset-md11>
+              <v-btn color="primary" @click.native="el = 4">Continue</v-btn>
+            </v-flex>
+          </v-layout>
+        </v-stepper-content>
+        <v-stepper-content step="3">
           <anime-head
             :cover="cover"
             :poster="poster"
@@ -71,11 +93,11 @@
           </anime-head>
           <v-layout row wrap>
             <v-flex offset-md11>
-              <v-btn color="primary" @click.native="el = 3">Continue</v-btn>
+              <v-btn color="primary" @click.native="el = 4">Continue</v-btn>
             </v-flex>
           </v-layout>
         </v-stepper-content>
-        <v-stepper-content step="3">
+        <v-stepper-content step="4">
           <v-layout>
             <v-flex xs6>
               <v-select
@@ -200,7 +222,8 @@ export default {
 			date: null,
 			cover: null,
 			poster: null,
-			animesStatus: []
+			animesStatus: [],
+			trailer: ""
 		};
 	},
 	methods: {
@@ -213,6 +236,7 @@ export default {
 				.then(item => {
 					this.names = Object.values(item.titles);
 					this.desc = item.synopsis;
+					this.trailer = `https://www.youtube.com/embed/${item.youtubeVideoId}`;
 					// TODO use trailer item.youtubeVideoId
 					switch (item.status) {
 						case "finished":
@@ -253,7 +277,7 @@ export default {
 				.mutate({
 					mutation: gql`
 						mutation($anime: AnimeInput!) {
-							addAnime(anime: $anime)
+							anime: addAnime(anime: $anime)
 						}
 					`,
 					variables: {
@@ -269,9 +293,27 @@ export default {
 						}
 					}
 				})
-				.then(_ => {
+				.then(({ data: { anime } }) => {
+					this.$apollo
+						.mutate({
+							mutation: gql`
+								mutation($media: MediaInput!, $anime: ID!) {
+									addMedia(media: $media) {
+										linkTo(anime: $anime)
+									}
+								}
+							`,
+							variables: {
+								anime,
+								media: {
+									name: "Trailer #1",
+									type: "TRAILER",
+									content: this.trailer
+								}
+							}
+						})
+						.then(_ => this.$router.push({ name: "List" }));
 					this.load = false;
-					this.$router.push({ name: "List" });
 				})
 				.catch(err => {
 					this.load = false;
