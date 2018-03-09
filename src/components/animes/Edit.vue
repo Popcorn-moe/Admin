@@ -206,18 +206,82 @@
               <v-btn icon @click.stop="getOpenings()">
                 <v-icon>get_app</v-icon>
               </v-btn>
-              <v-btn ico disabled>
+              <v-btn icon @click.stop="addOpening()">
                 <v-icon>add</v-icon>
               </v-btn>
-              <v-btn icon @click.stop="saveOpenings()">
+              <v-btn icon @click.stop="saveMedias()">
                 <v-icon>save</v-icon>
               </v-btn>
             </div>
             <v-divider></v-divider>
             <v-card>
               <v-data-table
-                :headers="openingsHeaders"
-                :items="anime.medias"
+                :headers="mediaHeaders"
+                :items="anime.medias.filter(({ type }) => type === 'OPENING' || type === 'ENDING' || type === 'OST')"
+                hide-actions
+                class="elevation-1"
+              >
+                <template slot="items" slot-scope="props">
+                  <td>{{ props.index + 1 }}</td>
+                  <td>
+                    <v-edit-dialog lazy>
+                      {{ props.item.name || "(empty)" }}
+                      <v-text-field
+                        slot="input"
+                        v-model="props.item.name"
+                        @change="() => props.item.changed = true"
+                        single-line
+                      ></v-text-field>
+                    </v-edit-dialog>
+                  </td>
+                  <td>
+										<v-edit-dialog lazy>
+											{{ props.item.type }}
+											<v-select
+											 	slot="input"
+												class="table-select"
+												:items="['OPENING', 'ENDING', 'OST']"
+												v-model="props.item.type"
+												@change="() => props.item.changed = true"
+												single-line
+											></v-select>
+										</v-edit-dialog>
+									</td>
+                  <td>{{ props.item.posted_date }}</td>
+                  <td>
+                    <v-edit-dialog lazy>
+                      {{ props.item.content || "(empty)" }}
+                      <v-text-field
+                        slot="input"
+                        v-model="props.item.content"
+                        @change="() => props.item.changed = true"
+                        single-line
+                      ></v-text-field>
+                    </v-edit-dialog>
+                  </td>
+                </template>
+              </v-data-table>
+            </v-card>
+          </v-expansion-panel-content>
+        </v-expansion-panel>
+      </v-flex>
+			<v-flex md12>
+        <v-expansion-panel prominent>
+          <v-expansion-panel-content>
+            <div slot="header">
+              Trailers
+              <v-btn icon @click.stop="addTrailer()">
+                <v-icon>add</v-icon>
+              </v-btn>
+              <v-btn icon @click.stop="saveMedias()">
+                <v-icon>save</v-icon>
+              </v-btn>
+            </div>
+            <v-divider></v-divider>
+            <v-card>
+              <v-data-table
+                :headers="mediaHeaders"
+                :items="anime.medias.filter(({ type }) => type === 'TRAILER')"
                 hide-actions
                 class="elevation-1"
               >
@@ -360,7 +424,7 @@ export default {
 				{ text: "Posted Date", value: "posted_date" },
 				{ text: "Content", value: "content" }
 			],
-			openingsHeaders: [
+			mediaHeaders: [
 				{ text: "Num", value: "idx" },
 				{ text: "Name", value: "name" },
 				{ text: "Type", value: "type" },
@@ -404,7 +468,6 @@ export default {
 							? {}
 							: results.sort((a, b) => a.length < b.length)[0];
 					openings.forEach(({ song, title, file }) => {
-						console.log(this.anime);
 						const type = title.split(" ")[0].toUpperCase();
 						const content = `https://openings.moe/video/${file}`;
 						this.anime.medias.push({
@@ -416,7 +479,28 @@ export default {
 					});
 				});
 		},
-		saveOpenings() {
+		addOpening() {
+			const num =
+				this.anime.medias.filter(
+					({ type }) =>
+						type === "OPENING" || type === "ENDING" || type === "OST"
+				).length + 1;
+			this.anime.medias.push({
+				name: `Opening #${num}`,
+				type: "OPENING",
+				content: ""
+			});
+		},
+		addTrailer() {
+			const num =
+				this.anime.medias.filter(({ type }) => type === "TRAILER").length + 1;
+			this.anime.medias.push({
+				name: `Trailer #${num}`,
+				type: "TRAILER",
+				content: ""
+			});
+		},
+		saveMedias() {
 			const toSave = this.anime.medias.filter(e => e.changed);
 			toSave.forEach(e => delete e.changed);
 			Promise.all(
@@ -483,8 +567,7 @@ export default {
 		},
 		saveEpisodes(season) {
 			const toSave = this.anime.seasons[season].episodes.filter(e => e.changed);
-			console.log(toSave);
-			//toSave.forEach(e => delete e.changed);
+			toSave.forEach(e => delete e.changed);
 			Promise.all(
 				toSave.map(({ id, name, type, content }) => {
 					return this.$apollo.mutate({
