@@ -217,7 +217,7 @@
             <v-card>
               <v-data-table
                 :headers="mediaHeaders"
-                :items="anime.medias.filter(({ type }) => type === 'OPENING' || type === 'ENDING' || type === 'OST')"
+                :items="openings"
                 hide-actions
                 class="elevation-1"
               >
@@ -259,8 +259,11 @@
                       ></v-text-field>
                     </v-edit-dialog>
                   </td>
+									<td>
+										<v-btn icon @click.stop="props.item.deleted = true"><v-icon>delete</v-icon></v-btn>
+									</td>
                 </template>
-              </v-data-table>
+              </v-data-table> 
             </v-card>
           </v-expansion-panel-content>
         </v-expansion-panel>
@@ -281,7 +284,7 @@
             <v-card>
               <v-data-table
                 :headers="mediaHeaders"
-                :items="anime.medias.filter(({ type }) => type === 'TRAILER')"
+                :items="trailers"
                 hide-actions
                 class="elevation-1"
               >
@@ -311,6 +314,11 @@
                       ></v-text-field>
                     </v-edit-dialog>
                   </td>
+									<td>
+										<v-btn icon small @click.stop="props.item.deleted = true">
+											<v-icon>delete</v-icon>
+										</v-btn>
+									</td>
                 </template>
               </v-data-table>
             </v-card>
@@ -343,6 +351,7 @@
 			</v-card>
 		</v-dialog>
 	</v-container>
+	<pre>{{ openings }}</pre>
   </div>
 </template>
 
@@ -429,9 +438,26 @@ export default {
 				{ text: "Name", value: "name" },
 				{ text: "Type", value: "type" },
 				{ text: "Posted Date", value: "posted_date" },
-				{ text: "Content", value: "content" }
+				{ text: "Content", value: "content" },
+				{ text: "Action", value: "action" }
 			]
 		};
+	},
+	computed: {
+		openings() {
+			return this.anime.medias.filter(({ type, deleted }) => {
+				console.log(deleted);
+				return (
+					(type === "OPENING" || type === "ENDING" || type === "OST") &&
+					!deleted
+				);
+			});
+		},
+		trailers() {
+			return this.anime.medias.filter(
+				({ type, deleted }) => type === "TRAILER" && !deleted
+			);
+		}
 	},
 	methods: {
 		opneningRegEx(name) {
@@ -453,6 +479,9 @@ export default {
 					).length > 0
 			);
 		},
+		openingUrl(file) {
+			return `https://openings.moe/video/${file}`;
+		},
 		getOpenings() {
 			const names = this.anime.names.filter(n => !this.hasJapanChar(n));
 			fetch(
@@ -467,24 +496,27 @@ export default {
 						results.length === 0
 							? {}
 							: results.sort((a, b) => a.length < b.length)[0];
-					openings.forEach(({ song, title, file }) => {
-						const type = title.split(" ")[0].toUpperCase();
-						const content = `https://openings.moe/video/${file}`;
-						this.anime.medias.push({
-							name: (song && song.title) || title,
-							type: type !== "OPENING" && type !== "ENDING" ? "OST" : type,
-							content,
-							changed: true
+					openings
+						.filter(
+							({ file }) =>
+								!this.anime.medias
+									.map(({ content }) => content)
+									.includes(this.openingUrl(file))
+						)
+						.forEach(({ song, title, file }) => {
+							const type = title.split(" ")[0].toUpperCase();
+							const content = this.openingUrl(file);
+							this.anime.medias.push({
+								name: (song && song.title) || title,
+								type: type !== "OPENING" && type !== "ENDING" ? "OST" : type,
+								content,
+								changed: true
+							});
 						});
-					});
 				});
 		},
 		addOpening() {
-			const num =
-				this.anime.medias.filter(
-					({ type }) =>
-						type === "OPENING" || type === "ENDING" || type === "OST"
-				).length + 1;
+			const num = this.openings.length + 1;
 			this.anime.medias.push({
 				name: `Opening #${num}`,
 				type: "OPENING",
@@ -492,8 +524,7 @@ export default {
 			});
 		},
 		addTrailer() {
-			const num =
-				this.anime.medias.filter(({ type }) => type === "TRAILER").length + 1;
+			const num = this.trailers.length + 1;
 			this.anime.medias.push({
 				name: `Trailer #${num}`,
 				type: "TRAILER",
@@ -501,19 +532,33 @@ export default {
 			});
 		},
 		saveMedias() {
-			const toSave = this.anime.medias.filter(e => e.changed);
+			const toSave = this.anime.medias.filter(e => e.changed && !e.deleted);
+			const toDelete = this.anime.medias.filter(e => e.deleted && e.id);
 			toSave.forEach(e => delete e.changed);
 			Promise.all(
-				toSave.map(({ id, name, type, content }) => {
-					return this.$apollo.mutate({
-						mutation: id ? UPDATE_MEDIA : ADD_MEDIA,
-						variables: {
-							anime: !id ? this.anime.id : undefined,
-							id: id ? id : undefined,
-							media: { name, type, content }
-						}
-					});
-				})
+				toSave
+					.map(({ id, name, type, content }) =>
+						this.$apollo.mutate({
+							mutation: id ? UPDATE_MEDIA : ADD_MEDIA,
+							variables: {
+								anime: !id ? this.anime.id : undefined,
+								id: id ? id : undefined,
+								media: { name, type, content }
+							}
+						})
+					)
+					.concat(
+						toDelete.map(({ id }) =>
+							this.$apollo.mutate({
+								mutation: gql`
+									mutation($id: ID!) {
+										deleteMedia(id: $id)
+									}
+								`,
+								variables: { id }
+							})
+						)
+					)
 			).then(_ => this.$apollo.queries.anime.refetch());
 		},
 		addSeason() {
