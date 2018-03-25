@@ -41,25 +41,25 @@ const KEY_ICON = {
 	ArrowUp: {
 		icon: "keyboard_arrow_up",
 		color: "purple",
-		sound: "/static/sounds/up.mp3"
+		sound: new Audio("/static/sounds/up.mp3")
 	},
 	ArrowDown: {
 		icon: "keyboard_arrow_down",
 		color: "amber",
-		sound: "/static/sounds/down.mp3"
+		sound: new Audio("/static/sounds/down.mp3")
 	},
 	ArrowLeft: {
 		icon: "keyboard_arrow_left",
 		color: "pink",
-		sound: "/static/sounds/left.mp3"
+		sound: new Audio("/static/sounds/left.mp3")
 	},
 	ArrowRight: {
 		icon: "keyboard_arrow_right",
 		color: "indigo",
-		sound: "/static/sounds/right.mp3"
+		sound: new Audio("/static/sounds/right.mp3")
 	},
-	a: { text: "A", color: "green", sound: "/static/sounds/A.mp3" },
-	b: { text: "B", color: "brown", sound: "/static/sounds/B.mp3" }
+	a: { text: "A", color: "green", sound: new Audio("/static/sounds/A.mp3") },
+	b: { text: "B", color: "brown", sound: new Audio("/static/sounds/B.mp3") }
 };
 
 export default {
@@ -97,7 +97,19 @@ export default {
 				}
 
 				this.konamiPreview = KEY_ICON[key] || KEY_ICON[key.toLowerCase()];
-				new Audio(this.konamiPreview.sound).play();
+				const { sound } = this.konamiPreview;
+				if (sound.paused) {
+					sound.currentTime = 0;
+					sound.play();
+				} else {
+					const handler = e => {
+						e.stopPropagation();
+						sound.removeEventListener("pause", handler);
+						sound.currentTime = 0;
+						sound.play();
+					};
+					sound.addEventListener("pause", handler);
+				}
 				this.konamiPreviewTimeout = setTimeout(
 					() => (this.konamiPreview = {}),
 					KONAMI_PREVIEW_TIME
@@ -161,12 +173,12 @@ export default {
 		text-align: center;
 		& > .icon {
 			font-size: 150px;
-			text-shadow: 5px 5px black;
+			text-shadow: 5px 5px white;
 		}
 		& > span {
 			font-size: 75px;
 			font-weight: bold;
-			text-shadow: 5px 5px black;
+			text-shadow: 5px 5px white;
 		}
 	}
   
