@@ -32,7 +32,7 @@
 		</v-toolbar-title>
 		<v-spacer></v-spacer>
 		<v-avatar>
-          <img :src="me.avatar" alt="avatar">
+          <img :src="me && me.avatar" alt="avatar">
         </v-avatar>
 	</v-toolbar>
 </template>

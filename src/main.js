@@ -1,14 +1,14 @@
 import Vue from "vue";
-import App from "./App";
+import App from "./App.vue";
 import router from "./router";
 import store from "./store";
 import apolloProvider from "./graphql";
 import { Vuetify, VMenu } from "vuetify/es5/components";
 import { VEditDialog } from "vuetify/es5/components/VDataTable";
 import colors from "vuetify/es5/util/colors";
+import "./stylus/main.styl";
 
 VEditDialog.components = VEditDialog.components || {};
-VEditDialog.components.VMenu = VMenu;
 VEditDialog.components.VMenu = VMenu;
 
 Vue.config.productionTip = false;
