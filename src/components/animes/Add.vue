@@ -78,7 +78,7 @@
               ></iframe>
             </v-flex>
              <v-flex offset-md11>
-              <v-btn color="primary" @click.native="el = 4">Continue</v-btn>
+              <v-btn color="primary" @click.native="el = 3">Continue</v-btn>
             </v-flex>
           </v-layout>
         </v-stepper-content>
