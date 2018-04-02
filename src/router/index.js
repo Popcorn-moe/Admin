@@ -1,12 +1,5 @@
 import Vue from "vue";
 import Router from "vue-router";
-import Index from "../components/Index";
-import Tags from "../components/tags/Tags";
-import Users from "../components/users/Users";
-import News from "../components/news/News";
-import Authors from "../components/authors/Authors";
-import Slider from "../components/slider/Slider.vue";
-import { AddAnime, ListAnime, EditAnime } from "../components/animes";
 
 Vue.use(Router);
 
@@ -15,25 +8,25 @@ export const routes = [
 		icon: "home",
 		path: "/",
 		name: "Index",
-		component: Index
+		component: () => import("../components/Index")
 	},
 	{
 		icon: "people",
 		path: "/users",
 		name: "Users",
-		component: Users
+		component: () => import("../components/users/Users")
 	},
 	{
 		icon: "equalizer",
 		path: "/news",
 		name: "News",
-		component: News
+		component: () => import("../components/news/News")
 	},
 	{
 		icon: "images",
 		path: "/slider",
 		name: "Slider",
-		component: Slider
+		component: () => import("../components/slider/Slider.vue")
 	},
 	{
 		icon: "video_library",
@@ -44,13 +37,13 @@ export const routes = [
 				icon: "list",
 				path: "/",
 				name: "List",
-				component: ListAnime
+				component: import("../components/animes/List")
 			},
 			{
 				icon: "add",
 				path: "/add",
 				name: "Add",
-				component: AddAnime
+				component: import("../components/animes/Add")
 			},
 			{
 				hide: true,
@@ -58,7 +51,7 @@ export const routes = [
 				path: "/edit/:id",
 				name: "Edit",
 				props: true,
-				component: EditAnime
+				component: import("../components/animes/Edit")
 			}
 		]
 	},
@@ -66,13 +59,13 @@ export const routes = [
 		icon: "label",
 		path: "/tags",
 		name: "Tags",
-		component: Tags
+		component: import("../components/tags/Tags")
 	},
 	{
 		icon: "people",
 		path: "/authors",
 		name: "Authors",
-		component: Authors
+		component: import("../components/authors/Authors")
 	}
 ];
 
