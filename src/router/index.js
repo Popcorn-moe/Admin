@@ -37,13 +37,13 @@ export const routes = [
 				icon: "list",
 				path: "/",
 				name: "List",
-				component: import("../components/animes/List")
+				component: () => import("../components/animes/List")
 			},
 			{
 				icon: "add",
 				path: "/add",
 				name: "Add",
-				component: import("../components/animes/Add")
+				component: () => import("../components/animes/Add")
 			},
 			{
 				hide: true,
@@ -51,7 +51,7 @@ export const routes = [
 				path: "/edit/:id",
 				name: "Edit",
 				props: true,
-				component: import("../components/animes/Edit")
+				component: () => import("../components/animes/Edit")
 			}
 		]
 	},
@@ -59,13 +59,13 @@ export const routes = [
 		icon: "label",
 		path: "/tags",
 		name: "Tags",
-		component: import("../components/tags/Tags")
+		component: () => import("../components/tags/Tags")
 	},
 	{
 		icon: "people",
 		path: "/authors",
 		name: "Authors",
-		component: import("../components/authors/Authors")
+		component: () => import("../components/authors/Authors")
 	}
 ];
 
