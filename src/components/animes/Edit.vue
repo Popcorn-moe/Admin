@@ -630,7 +630,7 @@ export default {
 			).then(_ => this.$apollo.queries.anime.refetch());
 		},
 		saveAll() {
-			const { id, names, status, desc } = this.anime;
+			const { id, names, status, desc, cover, background } = this.anime;
 			this.$apollo
 				.mutate({
 					mutation: gql`
@@ -645,7 +645,9 @@ export default {
 							tags: this.selectedTags,
 							authors: this.selectedAuthors,
 							status,
-							desc
+							desc,
+							cover,
+							background
 						}
 					}
 				})
