@@ -646,8 +646,9 @@ export default {
 							authors: this.selectedAuthors,
 							status,
 							desc,
-							cover,
-							background
+							cover: typeof cover === "string" ? undefined : cover,
+							background:
+								typeof background === "string" ? undefined : background
 						}
 					}
 				})
