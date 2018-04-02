@@ -708,7 +708,9 @@ export default {
 						names
 						status
 						desc
-						cover
+						cover {
+							normal
+						}
 						background
 						tags {
 							id
@@ -745,14 +747,16 @@ export default {
 					id: this.id
 				};
 			},
-			update: function({ anime }) {
+			update({ anime }) {
 				this.currentStatus = anime.status
 					.split("_")
 					.map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
 					.join(" ");
 				this.selectedTags = anime.tags.map(({ id }) => id);
 				this.selectedAuthors = anime.authors.map(({ id }) => id);
-				return clone(anime);
+				const nAnime = clone(anime);
+				nAnime.cover = nAnime.cover.normal;
+				return nAnime;
 			}
 		}
 	},
