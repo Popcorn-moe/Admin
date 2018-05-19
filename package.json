@@ -1,17 +1,17 @@
 {
-		"name": "popcorn.moe-admin",
+		"name": "@popcorn.moe/admin",
 		"version": "1.0.0",
-		"description": "",
+		"description": "Popcorn.moe Admin",
 		"repository": {
 				"type": "git",
-				"url": "git+https://github.com/Popcorn-moe/Popcorn.moe-Admin.git"
+				"url": "git+https://github.com/Popcorn-moe/Admin.git"
 		},
 		"author": "Popcorn-moe",
 		"license": "GPL-3.0",
 		"bugs": {
-				"url": "https://github.com/Popcorn-moe/Popcorn.moe-Admin/issues"
+				"url": "https://github.com/Popcorn-moe/Admin/issues"
 		},
-		"homepage": "https://github.com/Popcorn-moe/Popcorn.moe-Admin#readme",
+		"homepage": "https://github.com/Popcorn-moe/Admin#readme",
 		"scripts": {
 				"dev": "webpack-dev-server --inline --progress --config build/webpack.dev.conf.js",
 				"start": "npm run dev",
