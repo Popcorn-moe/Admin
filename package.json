@@ -27,14 +27,9 @@
 				]
 		},
 		"dependencies": {
+				"@popcorn.moe/apollo": "^1.0.0",
 				"algoliasearch": "^3.27.1",
-				"apollo-cache-inmemory": "^1.2.1",
-				"apollo-client": "^2.3.1",
-				"apollo-link": "^1.2.2",
-				"apollo-link-http": "^1.5.4",
-				"apollo-upload-client": "^8.0.0",
 				"clone": "^2.1.2",
-				"graphql": "^0.13.2",
 				"graphql-tag": "^2.9.2",
 				"marked": "^0.3.19",
 				"mavon-editor": "^2.6.3",
