@@ -86,6 +86,9 @@ const webpackConfig = merge(baseWebpackConfig, {
 				ignore: [".*"]
 			}
 		]),
+		new CopyWebpackPlugin(
+			["_redirects"].map(n => path.resolve(__dirname, "..", n))
+		),
 		new BundleAnalyzerPlugin({
 			analyzerMode: "static",
 			openAnalyzer: false
