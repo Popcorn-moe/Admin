@@ -484,9 +484,7 @@ export default {
 		},
 		getOpenings() {
 			const names = this.anime.names.filter(n => !this.hasJapanChar(n));
-			fetch(
-				"https://cors-anywhere.herokuapp.com/http://openings.moe/api/list.php"
-			)
+			fetch("https://cors.popcorn.moe/http://openings.moe/api/list.php")
 				.then(res => res.json())
 				.then(res => {
 					const results = names.map(n =>

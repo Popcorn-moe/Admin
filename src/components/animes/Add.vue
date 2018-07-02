@@ -252,16 +252,10 @@ export default {
 					this.date = item.startDate;
 					return Promise.all([
 						item.coverImage &&
-							fetch(
-								`https://cors-anywhere.herokuapp.com/${
-									item.coverImage.original
-								}`
-							)
+							fetch(`https://cors.popcorn.moe/${item.coverImage.original}`)
 								.then(res => res.blob())
 								.then(blob => (this.cover = blob)),
-						fetch(
-							`https://cors-anywhere.herokuapp.com/${item.posterImage.original}`
-						)
+						fetch(`https://cors.popcorn.moe/${item.posterImage.original}`)
 							.then(res => res.blob())
 							.then(blob => (this.poster = blob))
 					]);
