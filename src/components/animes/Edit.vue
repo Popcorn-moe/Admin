@@ -480,7 +480,7 @@ export default {
 			);
 		},
 		openingUrl(file) {
-			return `https://openings.moe/video/${file}`;
+			return `https://openings.moe/video/${file}.webm`;
 		},
 		getOpenings() {
 			const names = this.anime.names.filter(n => !this.hasJapanChar(n));
